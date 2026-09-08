@@ -57,8 +57,8 @@ character that was cut.
 
 ## Deployment
 
-Pushing a tag of the form `x.y.z` builds and publishes to Cloudflare Pages. The tag must
-match `version` in `package.json`, or the workflow stops.
+Pushing a tag of the form `x.y.z` builds and publishes to Cloudflare Workers. The tag
+must match `version` in `package.json`, or the workflow stops.
 
 ```bash
 npm version 1.0.0 --no-git-tag-version   # bump, commit
@@ -67,18 +67,27 @@ git tag 1.0.0 && git push origin 1.0.0
 
 Pull requests run the same typecheck, tests and build.
 
+`wrangler.toml` holds everything about the deployment: the project name, the assets
+directory and the custom domain. The Worker and its DNS record are created on the first
+deploy, so nothing has to be set up in the dashboard by hand.
+
 ### One-time setup
 
-The workflow expects these to exist already:
+Repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The token needs:
 
-1. A Cloudflare Pages project named `ips-payment-generator` (Workers & Pages → Create →
-   Pages → Direct Upload; the first upload can be a placeholder, the workflow takes over
-   afterwards).
-2. Repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The token needs
-   the **Cloudflare Pages: Edit** permission and nothing more.
-3. The custom domain `ips.tr1ckyf0x.dev` attached to that Pages project. Since the zone
-   is already on Cloudflare, adding it under the project's *Custom domains* creates the
-   DNS record itself.
+| Scope | Permission | Why |
+|---|---|---|
+| Account | Workers Scripts: Edit | create and deploy the Worker |
+| Zone (`tr1ckyf0x.dev`) | Workers Routes: Edit | attach the custom domain |
+| Zone (`tr1ckyf0x.dev`) | DNS: Edit | create the record for it |
+
+The scopes are two separate policies, and the split matters: `wrangler deploy` uploads
+through `/accounts/{id}/workers/…`, so a `Workers Scripts` permission granted on the zone
+rather than on the account fails with `Authentication error [code: 10000]` — a token that
+otherwise authenticates fine and can read the account name.
+
+Dropping the two zone permissions still deploys — the Worker just will not claim
+`ips.tr1ckyf0x.dev`, and the domain has to be attached in the dashboard instead.
 
 ## Licence
 

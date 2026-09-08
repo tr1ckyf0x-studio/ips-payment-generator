@@ -214,6 +214,16 @@ photograph can carry — the separator's position as a fraction of the block wid
 reads +1.1 %, about 1 mm, against a scan that itself covers only 205.9 of the 210 mm.
 Closing that would need a scan of an uncut blank on a flatbed, not a photograph.
 
+## Deployment
+
+Cloudflare **Workers** with static assets, not Pages: Cloudflare treats Pages as legacy,
+and `wrangler deploy` creates the project itself, so a release needs no dashboard step.
+`wrangler.toml` carries the project name, the assets directory and the custom domain, so
+the workflow passes no arguments that could drift from it.
+
+The first attempt did use Pages and failed with "The Pages project does not exist" —
+that path requires creating the project by hand first.
+
 ## Not done yet
 
 - Overlay printing onto pre-printed NCR stock (`drawBlank: false` exists in the renderer

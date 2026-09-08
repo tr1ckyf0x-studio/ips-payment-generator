@@ -1,0 +1,21 @@
+# Cloudflare Workers with static assets: the built site is served straight from
+# `dist`, with no Worker code of its own.
+#
+# Workers rather than Pages because Cloudflare treats Pages as legacy and points new
+# projects here — and because `wrangler deploy` creates the project on first run, so
+# there is no manual step in the dashboard before the first release.
+name = "ips-payment-generator"
+compatibility_date = "2026-09-09"
+
+[assets]
+directory = "./dist"
+# The app is a single page with no client-side routes; serving index.html for any path
+# means a stale bookmark or a hand-typed URL still opens the form rather than a 404.
+not_found_handling = "single-page-application"
+
+# Attaching the domain here rather than in the dashboard: wrangler creates the DNS
+# record and the route itself, which keeps the whole deployment reproducible from the
+# repository. Requires the token to carry Workers Routes and DNS edit rights on the zone.
+[[routes]]
+pattern = "ips.tr1ckyf0x.dev"
+custom_domain = true

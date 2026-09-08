@@ -25,28 +25,27 @@ export interface Sheet<T> {
 /**
  * Groups slips into sheets of three.
  *
- * Cut guides are drawn at every cell boundary except the sheet edge itself, and on
- * every sheet regardless of how full it is: on a sheet holding a single slip the guide
- * at 99 mm is the line along which the unused remainder is trimmed away, which is what
- * yields a slip of exactly 210 x 99 mm.
+ * A cut guide follows each slip that was actually printed, along its bottom edge: a
+ * sheet holding one slip gets one guide, at 99 mm, which is the line the unused
+ * remainder is trimmed off along to leave a slip of exactly 210 x 99 mm. Guiding the
+ * empty cells below it as well would draw lines across blank paper with nothing to
+ * separate.
+ *
+ * The guide after the last slip of a full sheet falls on the sheet edge, where there is
+ * likewise nothing to cut, and is left out.
  */
 export function paginate<T>(slips: T[], cellHeight: Mm): Array<Sheet<T>> {
   if (cellHeight <= 0) throw new RangeError('cellHeight must be positive');
 
-  const cutGuides: Mm[] = [];
-  for (let cell = 1; cell < SLIPS_PER_SHEET; cell += 1) {
-    const y = cell * cellHeight;
-    if (y < A4_HEIGHT) cutGuides.push(y);
-  }
-
   const sheets: Array<Sheet<T>> = [];
   for (let i = 0; i < slips.length; i += SLIPS_PER_SHEET) {
+    const placements = slips.slice(i, i + SLIPS_PER_SHEET).map((slip, cell) => ({
+      slip,
+      offsetY: cell * cellHeight,
+    }));
     sheets.push({
-      placements: slips.slice(i, i + SLIPS_PER_SHEET).map((slip, cell) => ({
-        slip,
-        offsetY: cell * cellHeight,
-      })),
-      cutGuides,
+      placements,
+      cutGuides: placements.map((p) => p.offsetY + cellHeight).filter((y) => y < A4_HEIGHT),
     });
   }
   return sheets;

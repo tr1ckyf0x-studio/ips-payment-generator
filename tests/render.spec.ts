@@ -105,8 +105,13 @@ describe('rendered PDF', () => {
     }
   });
 
-  it('draws dashed cut guides across the sheet at the cell boundaries', async () => {
-    const geometry = extractGeometry(await render([slip(1)]));
+  it('draws a dashed cut guide after each slip on the sheet', async () => {
+    // One slip, one guide: the empty cells below it are blank paper, and a line across
+    // them would mark a cut that separates nothing.
+    const one = extractGeometry(await render([slip(1)]));
+    expect(one.lines.filter((l) => l.dashed).map((g) => Math.round(g.y0))).toEqual([99]);
+
+    const geometry = extractGeometry(await render([slip(1), slip(2), slip(3)]));
     const guides = geometry.lines.filter((l) => l.dashed);
 
     expect(guides.map((g) => Math.round(g.y0))).toEqual([99, 198]);

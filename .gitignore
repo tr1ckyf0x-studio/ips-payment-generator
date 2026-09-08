@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+
+# Reference scans carry personal data (name, address, account number)
+references/scans/
+.visual/
+__pycache__/
+*.tsbuildinfo

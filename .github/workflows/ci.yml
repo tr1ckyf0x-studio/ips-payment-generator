@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # No `lfs: true` on purpose. The reference PDFs and comparison fonts are in LFS,
+      # and nothing the build or the tests touch is — verified by running the suite on a
+      # checkout with LFS skipped. Fetching them here would spend the free LFS bandwidth
+      # on every routine build.
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      # The geometry tests render PDFs and read them back, which needs pdftocairo,
+      # pdftotext and pdftoppm. Without poppler most of the suite cannot run at all.
+      - name: Install poppler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends poppler-utils
+          # Recorded because the SVG header pdftocairo writes varies between versions,
+          # and reading the page size out of it has broken on that before.
+          pdftocairo -v 2>&1 | head -1
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build

@@ -17,6 +17,16 @@ export default defineConfig({
       },
     ],
   },
+  build: {
+    /**
+     * The default 500 kB warns about the lazy `renderer` chunk — pdf-lib, fontkit and the
+     * QR builder, 1058 kB, which no longer blocks the first paint. Its size is a decision
+     * rather than an accident, so the threshold is raised past it, but only just: the
+     * entry chunk is held to its own ceiling by `tests/bundle.spec.ts`, and this still
+     * trips if the deferred half starts growing.
+     */
+    chunkSizeWarningLimit: 1100,
+  },
   test: {
     globals: true,
     environment: 'node',

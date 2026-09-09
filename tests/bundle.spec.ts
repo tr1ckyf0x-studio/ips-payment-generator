@@ -1,54 +1,89 @@
 /**
- * The shipped bundle must not carry the standard PDF font metrics.
+ * Two properties of the shipped bundle that nothing else can check.
  *
- * This checks the artifact rather than the module graph, because the two differ: vitest
- * loads `pdf-lib` from its CommonJS build, outside vite's transform, so the alias in
- * `vite.config.ts` does not apply here — a test importing `pdf-lib` gets the real
- * `@pdf-lib/standard-fonts` and would pass whether or not the browser build does. What
- * ships is what the build emits, so that is what is measured.
- *
- * The marker is the compressed AFM payload itself: each of the fourteen fonts is a
- * zlib stream in base64, so a long run beginning `eJy` is font data and nothing else.
- * Before the alias the chunk held twelve of them; after it, none.
- *
- * See `src/pdf/standardFonts.ts` for why they are not wanted.
+ * These are asserted on the artifact rather than the module graph, because the two
+ * differ: vitest loads `pdf-lib` from its CommonJS build, outside vite's transform, so
+ * the alias in `vite.config.ts` does not apply here — a test importing `pdf-lib` gets the
+ * real `@pdf-lib/standard-fonts` and would pass whether or not the browser build does.
+ * What ships is what the build emits, so that is what is measured.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { build } from 'vite';
 
-/** A zlib stream in base64: 0x78 0x9c encodes as "eJy". */
-const COMPRESSED_PAYLOAD = /eJy[A-Za-z0-9+/]{200,}/g;
+/**
+ * A zlib stream in base64: 0x78 0x9c encodes as "eJy". Each of the fourteen standard
+ * fonts is one, so a long run like this is font metrics and nothing else. Twelve of them
+ * were in the bundle before the alias.
+ */
+const COMPRESSED_PAYLOAD = /eJy[A-Za-z0-9+\/]{200,}/g;
 
-let chunk: string;
+/**
+ * The entry chunk measured 300.8 kB once the PDF pipeline was made lazy, against 1687 kB
+ * when it was not. The ceiling is loose enough for ordinary growth and tight enough to
+ * catch a static import that drags pdf-lib, fontkit or pdf.js back into the first load.
+ */
+const ENTRY_CEILING = 450 * 1024;
+
+let chunks: Array<{ name: string; code: string }>;
+let entry: { name: string; code: string };
 let outDir: string;
 
 beforeAll(async () => {
   outDir = mkdtempSync(join(tmpdir(), 'bundle-'));
-  await build({ logLevel: 'error', build: { outDir, sourcemap: false, emptyOutDir: true } });
+  // Explicitly production. vitest runs with NODE_ENV=test, which vite carries into the
+  // bundle, and React would ship its development build — 200 kB that never reaches a
+  // user, making the size ceiling below meaningless. `mode` alone does not undo it.
+  await build({
+    mode: 'production',
+    logLevel: 'error',
+    define: { 'process.env.NODE_ENV': '"production"' },
+    build: { outDir, sourcemap: false, emptyOutDir: true },
+  });
+
   const assets = join(outDir, 'assets');
-  const entry = readdirSync(assets).find((f) => /^index-.*\.js$/.test(f));
-  expect(entry, 'the build emitted no entry chunk').toBeDefined();
-  chunk = readFileSync(join(assets, entry!), 'utf8');
+  chunks = readdirSync(assets)
+    .filter((f) => f.endsWith('.js'))
+    .map((name) => ({ name, code: readFileSync(join(assets, name), 'utf8') }));
+
+  const found = chunks.find((c) => /^index-.*\.js$/.test(c.name));
+  expect(found, 'the build emitted no entry chunk').toBeDefined();
+  entry = found!;
 }, 120_000);
 
 afterAll(() => rmSync(outDir, { recursive: true, force: true }));
 
 describe('the built bundle', () => {
   it('is the real application, not an empty build', () => {
-    // Guards the assertion below from passing vacuously.
-    expect(chunk.length).toBeGreaterThan(500_000);
-    expect(chunk).toContain('НАЛОГ ЗА УПЛАТУ');
+    // Guards the assertions below from passing vacuously.
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.reduce((n, c) => n + c.code.length, 0)).toBeGreaterThan(1_000_000);
+    expect(chunks.some((c) => c.code.includes('НАЛОГ ЗА УПЛАТУ'))).toBe(true);
   });
 
-  it('carries no standard PDF font metrics', () => {
-    const blobs = chunk.match(COMPRESSED_PAYLOAD) ?? [];
+  it('carries no standard PDF font metrics, in any chunk', () => {
+    const guilty = chunks
+      .map((c) => ({ name: c.name, blobs: (c.code.match(COMPRESSED_PAYLOAD) ?? []).length }))
+      .filter((c) => c.blobs > 0);
     expect(
-      blobs.length,
-      `${blobs.length} compressed font payload(s) in the bundle: the ` +
-        '@pdf-lib/standard-fonts alias in vite.config.ts is not taking effect',
-    ).toBe(0);
+      guilty,
+      'the @pdf-lib/standard-fonts alias in vite.config.ts is not taking effect',
+    ).toEqual([]);
+  });
+
+  it('keeps the PDF pipeline out of the first load', () => {
+    const size = Buffer.byteLength(entry.code);
+    expect(
+      size,
+      `the entry chunk is ${(size / 1024).toFixed(0)} kB: something the form does not ` +
+        'need to paint is being imported statically — see src/ui/usePdfDocument.ts',
+    ).toBeLessThan(ENTRY_CEILING);
+
+    // The pipeline still has to be in the output, just not in the entry chunk.
+    const worker = readdirSync(join(outDir, 'assets')).find((f) => f.includes('pdf.worker'));
+    expect(worker, 'the pdf.js worker was not emitted').toBeDefined();
+    expect(statSync(join(outDir, 'assets', worker!)).size).toBeGreaterThan(100_000);
   });
 });

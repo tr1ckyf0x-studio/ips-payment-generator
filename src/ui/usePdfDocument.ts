@@ -6,11 +6,25 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { PROFILES, type ProfileId } from '../layout/formSpec.ts';
-import { renderDocument, type QrReport, type ShrunkField } from '../pdf/renderer.ts';
-import { loadFonts } from '../pdf/fonts.ts';
+import type { QrReport, ShrunkField } from '../pdf/renderer.ts';
 import type { Slip } from '../model/slip.ts';
 
 const DEBOUNCE_MS = 250;
+
+/**
+ * pdf-lib, fontkit and the QR builder come to 883 kB and are needed only once there is
+ * something to render, so they are fetched on the first run rather than before the form
+ * appears. The import is already inside the debounced effect, which is asynchronous and
+ * has a pending state, so this costs no extra machinery — and the browser caches the
+ * chunk, so only the first render waits for it.
+ */
+async function pdfPipeline() {
+  const [renderer, fonts] = await Promise.all([
+    import('../pdf/renderer.ts'),
+    import('../pdf/fonts.ts'),
+  ]);
+  return { renderDocument: renderer.renderDocument, loadFonts: fonts.loadFonts };
+}
 
 export interface PdfState {
   bytes: Uint8Array | undefined;
@@ -38,6 +52,7 @@ export function usePdfDocument(slips: Slip[], profileId: ProfileId): PdfState {
 
     const timer = setTimeout(async () => {
       try {
+        const { renderDocument, loadFonts } = await pdfPipeline();
         const fonts = await loadFonts();
         const { bytes, shrunk, qr } = await renderDocument(slips, {
           profile: PROFILES[profileId],

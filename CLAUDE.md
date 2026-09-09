@@ -91,6 +91,35 @@ it over the repository's own copy would cut a subset out of a subset and lose ch
 irrecoverably. `tests/fonts.spec.ts` checks coverage: a missing glyph does not throw, it
 just prints nothing, so nothing else would catch it.
 
+## The PDF pipeline is deferred
+
+Nothing that makes a PDF is needed to paint the form, so none of it is in the first load.
+The entry chunk is **300.8 kB** (97.5 kB gzip) against 1687 kB when everything was
+static:
+
+| chunk | kB | gzip | fetched |
+|---|---:|---:|---|
+| `index` | 300.8 | 97.5 | on load |
+| `pdf` (pdf.js) | 365.1 | 107.6 | when there is a document to show |
+| `renderer` (pdf-lib, fontkit, qrcode) | 1058.2 | 428.8 | on the first render |
+| `pdf.worker` | 1375.8 | — | by pdf.js itself |
+
+Two cuts, both `import()` rather than `React.lazy`:
+
+- `usePdfDocument` imports the renderer inside its debounced effect, which was already
+  asynchronous and already had a pending state, so deferring cost no machinery.
+- `PdfPreview` imports pdf.js inside its effect and caches the promise at module scope.
+  The component, its heading and its styles stay in the entry chunk, so the pane is
+  never an empty frame while the library arrives — the heading already says "updating".
+
+`tests/bundle.spec.ts` holds the entry chunk under 450 kB. That guard is what keeps the
+split from quietly reverting: a static import of the renderer puts it back to 1344 kB,
+and nothing else would notice. It was verified to fail that way.
+
+The build must be run in production mode to measure this. vitest sets `NODE_ENV=test`,
+vite carries that into the bundle, and React's development build is 200 kB that never
+ships — enough to make a size ceiling meaningless.
+
 ## The standard PDF fonts are stubbed out
 
 `@pdf-lib/standard-fonts` carries the AFM metrics of the fourteen fonts every reader

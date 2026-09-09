@@ -193,6 +193,10 @@ has to be wrong in both directions to reach paper.
 ## Conventions
 
 - String-literal constants via `as const` objects, not `enum`.
+- `@types/node` tracks the **runtime**, not npm's latest. The types describe APIs that
+  have to exist when the code runs, so they follow the `engines` field — today Node 24,
+  the active LTS. `npm outdated` will keep offering a newer major; that is expected, and
+  taking it would be describing a Node we do not run on.
 - The šifra plaćanja is stored as its two halves (`oblikPlacanja`, `osnovPlacanja`) and
   joined by `sifraPlacanja()`. Storing the joined code made either half unselectable
   until the other was set; `tests/slip.spec.ts` guards against a regression.

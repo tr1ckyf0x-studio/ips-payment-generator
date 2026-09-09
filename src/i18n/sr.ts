@@ -21,10 +21,8 @@ export const sr: Translation = {
     blank: 'Obrazac',
     addSlip: 'Dodaj nalog',
     download: 'Preuzmi PDF',
-    forgetPayer: 'zaboravi platioca',
     printHint:
       'Pri štampi izaberite <b>razmeru 100 % / Actual size</b>, a ne „prilagodi stranici“ — inače obrazac neće odgovarati propisanim 210 × 99 mm. Secite po isprekidanoj liniji.',
-    payerHint: 'Podaci o platiocu čuvaju se u ovom pregledaču i unose se u nove naloge.',
     buildFailed: 'Nije moguće napraviti PDF: {{message}}',
     shrunkWarning:
       'Tekst je morao znatno da se smanji da bi stao u polje: {{fields}}. Na papiru će biti sitno — bolje ga skratite.',

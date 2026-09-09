@@ -18,10 +18,8 @@ export const en: Translation = {
     blank: 'Blank',
     addSlip: 'Add slip',
     download: 'Download PDF',
-    forgetPayer: 'forget payer',
     printHint:
       'Print at <b>100 % / Actual size</b>, not "fit to page" — otherwise the slip will not match the required 210 × 99 mm. Cut along the dashed line.',
-    payerHint: 'The payer details are kept in this browser and filled into new slips.',
     buildFailed: 'Could not build the PDF: {{message}}',
     shrunkWarning:
       'Text had to be shrunk considerably to fit its field: {{fields}}. It will be small on paper — better to shorten it.',

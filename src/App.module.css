@@ -68,20 +68,6 @@
   color: var(--muted);
 }
 
-.link {
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.link:hover {
-  color: var(--text);
-}
-
 .hint {
   margin: 0;
   padding: 0.6rem 0.75rem;

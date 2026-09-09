@@ -7,36 +7,24 @@ import { emptySlip, type Slip } from './model/slip.ts';
 import { SLIPS_PER_SHEET } from './layout/paginate.ts';
 import { DEFAULT_PROFILE, type ProfileId } from './layout/formSpec.ts';
 import { LEGIBLE_SIZE_PT } from './layout/fitText.ts';
-import { browserPayerStore } from './storage/payerDetails.ts';
 import { LANGUAGE_NAMES, type Language } from './i18n/index.ts';
 import styles from './App.module.css';
 
 let nextId = 0;
 const newId = () => `slip-${(nextId += 1)}`;
 
-const payerStore = browserPayerStore();
-
-/** A new slip, carrying over the payer's remembered details. */
-function newSlip(payer: string): Slip {
-  return { ...emptySlip(newId()), platilac: payer };
+function newSlip(): Slip {
+  return emptySlip(newId());
 }
 
 export function App() {
   const { t, i18n } = useTranslation();
-  const [payer, setPayer] = useState(() => payerStore.load());
   const [profileId, setProfileId] = useState<ProfileId>(DEFAULT_PROFILE);
-  const [slips, setSlips] = useState<Slip[]>(() => [newSlip(payerStore.load())]);
+  const [slips, setSlips] = useState<Slip[]>(() => [newSlip()]);
   const { bytes, shrunk, qr, error, pending } = usePdfDocument(slips, profileId);
 
   const update = useCallback((index: number, slip: Slip) => {
-    setSlips((prev) => {
-      // Editing the payer updates what a new slip will start from.
-      if (prev[index]?.platilac !== slip.platilac) {
-        payerStore.save(slip.platilac);
-        setPayer(slip.platilac);
-      }
-      return prev.map((item, i) => (i === index ? slip : item));
-    });
+    setSlips((prev) => prev.map((item, i) => (i === index ? slip : item)));
   }, []);
 
   const remove = useCallback((index: number) => {
@@ -52,12 +40,7 @@ export function App() {
   }, []);
 
   const add = useCallback(() => {
-    setSlips((prev) => [...prev, newSlip(payerStore.load())]);
-  }, []);
-
-  const forgetPayer = useCallback(() => {
-    payerStore.clear();
-    setPayer('');
+    setSlips((prev) => [...prev, newSlip()]);
   }, []);
 
   // The tab title lives outside React's tree, so it is set here rather than in HTML.
@@ -126,14 +109,6 @@ export function App() {
             <h1>{t('app.title')}</h1>
             <p className={styles.summary}>
               {summary}
-              {payer.trim() && (
-                <>
-                  {' · '}
-                  <button type="button" className={styles.link} onClick={forgetPayer}>
-                    {t('app.forgetPayer')}
-                  </button>
-                </>
-              )}
             </p>
           </div>
           <div className={styles.topActions}>
@@ -171,7 +146,7 @@ export function App() {
         </div>
 
         <p className={styles.hint}>
-          <Trans i18nKey="app.printHint" components={{ b: <b /> }} /> {t('app.payerHint')}
+          <Trans i18nKey="app.printHint" components={{ b: <b /> }} />
         </p>
 
         {error && <p className={styles.error}>{t('app.buildFailed', { message: error })}</p>}

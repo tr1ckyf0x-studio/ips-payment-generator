@@ -205,11 +205,15 @@ has to be wrong in both directions to reach paper.
 - Reference PDFs are in Git LFS; the application's own fonts are not. Nothing the build or the tests read comes from LFS, so CI checks out without it —
   otherwise every routine build would draw on the free LFS bandwidth. Verified by running
   the suite on a checkout with `GIT_LFS_SKIP_SMUDGE=1`.
-- The payer's details are the one thing kept between visits
-  (`src/storage/payerDetails.ts`, one `localStorage` key). The store takes its `Storage`
-  by argument so it can be tested without a browser, and guards every access: Safari's
-  private mode and blocked site data both throw, and a form that crashed there would be
-  worse than one that forgets. Nothing else is persisted — a slip is a one-off document.
+- **Nothing about a payment is kept anywhere** — not between visits, not between slips
+  within a visit. A new slip starts empty; the way to reuse a payer is Duplicate, which
+  copies the whole slip and is explicit about it. The interface language is the only
+  thing written to `localStorage`, by i18next.
+
+  This did once remember the payer, in `src/storage/payerDetails.ts`, and the store was
+  careful about it — injected `Storage`, every access guarded, because Safari's private
+  mode and blocked site data both throw. Careful storage of something not worth storing
+  is still storage; it was removed rather than improved.
 - "место и датум пријема" and "датум извршења" are filled in by the bank at payment
   time, so they are neither form fields nor model fields — but their rules and wording
   are still drawn. `tests/values.spec.ts` guards both halves of that.

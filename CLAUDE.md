@@ -363,13 +363,19 @@ thing a user can be surprised by is paper coming out different.
 
 | | when | example |
 |---|---|---|
-| MAJOR | the printed slip changes | blank geometry, a different default profile, the QR moving |
-| MINOR | a new capability, existing output identical | another interface language, another blank variant, a new field |
+| MAJOR | what the slip contains, or how big it is | an element added or removed, a different default blank, the 99 mm cell changing |
+| MINOR | a new capability, or geometry corrected **towards** the real blank | another interface language, another blank variant, a field measured into a better position |
 | PATCH | fixes and internals, output byte-identical | a shrink-to-fit bug, a dependency bump, bundle work |
 
-The geometry tests are the arbiter rather than judgement: **if a release had to change
-`tests/layout.spec.ts`, `tests/values.spec.ts` or the reference fixture, it is MAJOR.**
-Those tests exist precisely to notice when the paper moves.
+Moving something on the sheet is MINOR **only when there is a measurement showing the
+new position is closer to the physical blank than the old one**. That is the arbiter, and
+it is what stops "minor" from becoming a licence to nudge things by eye: without such
+evidence, moving an element is MAJOR. The comparison is usually a scan holding our
+printout and a real slip in one frame, where the scanner's own scale cancels.
+
+`1.0.0` was cut under a stricter reading of this — any movement at all counted as MAJOR —
+which made a 0.4 mm correction cost a major version. The rule was relaxed rather than
+quietly ignored.
 
 ### Cutting a release
 

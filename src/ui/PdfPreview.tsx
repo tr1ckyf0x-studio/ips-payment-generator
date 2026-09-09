@@ -68,9 +68,10 @@ export function PdfPreview({ bytes, pending }: Props) {
           canvas.className = styles.page;
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          const context = canvas.getContext('2d');
-          if (!context) continue;
-          await page.render({ canvasContext: context, viewport }).promise;
+          // pdf.js 6 takes the canvas and finds its own context; passing a
+          // `canvasContext` as well is the backwards-compatible path its own types
+          // discourage, and it is only valid with a null canvas.
+          await page.render({ canvas, viewport }).promise;
           canvases.push(canvas);
         }
 

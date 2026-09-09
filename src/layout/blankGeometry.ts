@@ -43,7 +43,8 @@ export interface BlankGeometry {
   title: { yTop: Mm; right: Mm };
   /** "Образац бр. 1" at the foot of the blank. */
   footer: { centre: Mm; yTop: Mm };
-  qr: QrArea;
+  /** Where the QR sits horizontally and how big it is; its `y` is derived. */
+  qr: Omit<QrArea, 'y'>;
   boxStroke: Mm;
   ruleStroke: Mm;
 }
@@ -210,5 +211,23 @@ export function createProfile(g: BlankGeometry): FormProfile {
     slots.push(boxSlot('hitno', g.hitno));
   }
 
-  return { id: g.id, width: 210, height: 99, primitives, slots, qr: g.qr };
+  return { id: g.id, width: 210, height: 99, primitives, slots, qr: qrArea(g) };
+}
+
+/**
+ * The QR, centred in the clear band between the framed fields and the hitno box.
+ *
+ * Derived rather than declared. As a coordinate it went stale the moment either
+ * neighbour moved: the symbol sat 0.5 mm under "позив на број" and 7.2 mm above hitno,
+ * which reads as crowding the field above it rather than as occupying the gap. The band
+ * is the only free space on a blank that predates instant payments, so the rule is
+ * simply to sit in the middle of it.
+ *
+ * Without a hitno box the band ends at the "датум извршења" rule, which is where that
+ * box's lower edge lands anyway.
+ */
+function qrArea(g: BlankGeometry): QrArea {
+  const top = g.fields.pozivNaBroj.y + g.fields.pozivNaBroj.h;
+  const bottom = g.hitno ? g.hitno.y : g.rules.datum.y;
+  return { x: g.qr.x, y: top + (bottom - top - g.qr.size) / 2, size: g.qr.size };
 }

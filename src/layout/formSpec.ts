@@ -37,7 +37,8 @@ const PAUSAL: BlankGeometry = {
   hitno: { x: 178.04, y: 76.7, w: 5.15, h: 4.1 },
   title: { yTop: 9.16, right: 199.44 },
   footer: { centre: 106.4, yTop: 87.84 },
-  qr: { x: 173.44, y: 48.5, size: 26 },
+  // Vertically centred in the band below the framed fields; see `qrArea`.
+  qr: { x: 173.44, size: 26 },
 };
 
 /**
@@ -77,8 +78,8 @@ const OPTIMUM: BlankGeometry = {
   // rule and ends 197.4 mm right of the blocks' left edge.
   title: { yTop: 3.6, right: 202.92 },
   footer: { centre: 104.4, yTop: 92.3 },
-  // Below the framed fields and clear of the hitno box, as on the reference.
-  qr: { x: 177.31, y: 48.2, size: 26 },
+  // Vertically centred in the band below the framed fields; see `qrArea`.
+  qr: { x: 177.31, size: 26 },
 };
 
 export const pausalProfile: FormProfile = createProfile(PAUSAL);

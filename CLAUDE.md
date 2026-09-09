@@ -253,10 +253,19 @@ Its box carries `beyondReference: true` so the layout tests can tell a deliberat
 addition from a drift against the reference.
 
 **It also forced the QR to move.** The QR had been placed before this element was
-measured, and the two overlapped — the outline landed inside the symbol. The QR is now
-26 mm at `173.44, 48.5`, which is what the 28.8 mm of clear height between the framed
-fields and the hitno box allows. `tests/ips.spec.ts` now asserts the QR overlaps no
-primitive at all.
+measured, and the two overlapped — the outline landed inside the symbol. It was given a
+coordinate clear of the box, and `tests/ips.spec.ts` asserts it overlaps no primitive at
+all.
+
+**That coordinate then went stale, so the QR's `y` is now derived.** Sitting where it was
+first put, the symbol had 0.5 mm of air above it and 7.2 mm below on the OPTIMUM blank:
+clear of everything, but reading as crowding "позив на број" rather than occupying the
+gap. `qrArea()` in `blankGeometry.ts` centres it in the band between the bottom of that
+field and the top of the hitno box, so neither neighbour can move without taking the QR
+with it. `BlankGeometry.qr` therefore declares only `x` and `size`; the band gives the
+rest — 3.9 mm each side on OPTIMUM, 1.4 mm on the tighter pausal reference.
+`tests/profiles.spec.ts` holds both blanks to it, and was verified to fail on the old
+placement.
 
 ## What the scans still cannot pin down
 

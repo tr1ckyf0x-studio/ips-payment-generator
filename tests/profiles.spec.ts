@@ -67,6 +67,21 @@ describe.each(ids)('the %s blank', (id) => {
     }
   });
 
+  it('centres the QR in the band between the framed fields and hitno', () => {
+    // The band is the only free space on a blank that predates instant payments, and
+    // the QR is derived from its neighbours rather than given a coordinate. As a
+    // coordinate it had drifted to 0.5 mm under "позив на број" and 7.2 mm above hitno,
+    // which reads as crowding the field rather than occupying the gap.
+    const box = (id: string) => boxes.find((b) => b.id === id)!;
+    const top = box('pozivNaBroj').y + box('pozivNaBroj').h;
+    const bottom = box('hitno').y;
+
+    const above = profile.qr.y - top;
+    const below = bottom - (profile.qr.y + profile.qr.size);
+    expect(above, 'the QR sits above its band').toBeGreaterThan(0);
+    expect(above).toBeCloseTo(below, 2);
+  });
+
   it('leaves the QR clear of every drawn element', () => {
     const { x, y, size } = profile.qr;
     for (const item of [...boxes, ...rules]) {

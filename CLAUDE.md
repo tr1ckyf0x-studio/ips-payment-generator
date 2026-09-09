@@ -325,7 +325,9 @@ that path requires creating the project by hand first.
 
 ## Git and releases
 
-**One logical change, one commit**, the message a single line in the past tense. That
+**One logical change, one commit**, the message a single line in the past tense — with
+one exception: the version bump reads `Release 1.1.0`, naming the release rather than
+describing an action. That
 discipline is not bookkeeping: it is what makes `git bisect` land on states somebody
 intended, and what lets the release notes be generated instead of written.
 
@@ -372,7 +374,7 @@ because a build labelled with the wrong version is worse than no build.
 
 ```bash
 npm version 0.2.0 --no-git-tag-version     # package.json only
-git commit -am 'Released 0.2.0'
+git commit -am 'Release 0.2.0'
 git commit --amend --no-edit -S            # tags and releases are signed
 git push origin main
 git tag -s 0.2.0 -m 0.2.0 && git push origin 0.2.0

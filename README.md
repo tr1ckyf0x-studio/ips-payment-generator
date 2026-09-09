@@ -65,7 +65,7 @@ than generated from the commit list.
 
 ```bash
 npm version 0.2.0 --no-git-tag-version     # package.json only
-git commit -am 'Released 0.2.0'
+git commit -am 'Release 0.2.0'
 git commit --amend --no-edit -S            # releases are signed
 git push origin main
 git tag -s 0.2.0 -m 0.2.0 && git push origin 0.2.0

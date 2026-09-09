@@ -394,17 +394,21 @@ gh release create 0.2.0 --title 0.2.0 --notes-file <written notes> --verify-tag
 Deliberately not a workflow step. A release published automatically could only carry the
 commit list, and that is the thing this project decided not to ship.
 
-### Still to do by hand, in the repository settings
+### The `production` environment
 
-The `production` environment exists — GitHub creates it from the `environment:` block in
-`deploy.yml` — but carries no rules, and the Cloudflare credentials sit at repository
-scope where every workflow can read them:
+GitHub creates it from the `environment:` block in `deploy.yml`, and it now carries the
+deployment credentials and a gate:
 
-- a deployment tag policy on `production`, so only `[0-9]+.[0-9]+.[0-9]+` can deploy.
-  Today that is enforced only by a shell step, which anyone editing the workflow can
-  remove;
-- `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` moved to environment secrets, so a
-  token that can deploy is not readable by a workflow running on a pull request.
+- **`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are environment secrets**, not
+  repository ones. A token that can deploy is therefore unreadable by any workflow that
+  does not declare `environment: production` — CI on a pull request cannot see it.
+- **A required reviewer** must approve each deployment, so pushing a tag no longer
+  publishes on its own: the run waits until it is approved in the Actions tab.
+
+Still open: a deployment tag policy restricting the environment to
+`[0-9]+.[0-9]+.[0-9]+`. Today the tag shape is enforced only by a shell step in the
+workflow, which anyone editing the workflow can remove; the environment would enforce it
+outside the workflow's reach.
 
 ## Not done yet
 

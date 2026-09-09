@@ -2,6 +2,9 @@
   "name": "ips-payment-generator",
   "private": true,
   "version": "0.1.0",
+  "engines": {
+    "node": ">=24"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,11 +12,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "fixture": "node --experimental-strip-types tools/buildFixture.ts",
-    "visual": "node --experimental-strip-types tools/visualCheck.ts",
-    "fonts": "node --experimental-strip-types tools/fontSamples.ts",
-    "ips:verify": "node --experimental-strip-types tools/verifyIps.ts",
-    "fonts:subset": "node --experimental-strip-types tools/subsetFonts.ts"
+    "fixture": "node tools/buildFixture.ts",
+    "visual": "node tools/visualCheck.ts",
+    "fonts": "node tools/fontSamples.ts",
+    "ips:verify": "node tools/verifyIps.ts",
+    "fonts:subset": "node tools/subsetFonts.ts"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",

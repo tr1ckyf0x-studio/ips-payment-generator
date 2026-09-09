@@ -20,7 +20,8 @@ the device.
 
 ## Development
 
-Requires Node 22 and [poppler](https://poppler.freedesktop.org) (`pdftocairo`,
+Requires Node 24 — the active LTS, and the first line where TypeScript is stripped
+without a flag — and [poppler](https://poppler.freedesktop.org) (`pdftocairo`,
 `pdftotext`, `pdftoppm`) — the tests render PDFs and measure them back.
 
 ```bash

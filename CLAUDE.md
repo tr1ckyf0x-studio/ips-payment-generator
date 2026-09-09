@@ -277,6 +277,83 @@ the workflow passes no arguments that could drift from it.
 The first attempt did use Pages and failed with "The Pages project does not exist" —
 that path requires creating the project by hand first.
 
+## Git and releases
+
+**One logical change, one commit**, the message a single line in the past tense. That
+discipline is not bookkeeping: it is what makes `git bisect` land on states somebody
+intended, and what lets the release notes be generated instead of written.
+
+**History is rewritable until it is pushed, and immutable after.** Signing works by
+amending, so every batch gets rewritten once between being committed and being pushed —
+which is fine while it is local. Once on `origin` a commit stays. Breaking that rule cost
+something real on 2026-09-09: rewriting already-published commits orphaned the deployment
+records GitHub had made for them, and four of the five still point at commits that are no
+longer on `main`.
+
+**Work goes straight to `main`.** The suite runs locally before every push and there is
+nobody else to review, so a pull request to oneself buys ceremony and no safety. Open a
+branch when you want CI's verdict *before* the change lands — changes to the workflows
+themselves are the clear case, since they cannot be exercised locally.
+
+**There is no `CHANGELOG.md`.** It would duplicate the commit log, and a file that has to
+be hand-edited on every change is the first thing forgotten and the first thing to
+conflict. What a reader wants lives on the Releases page instead.
+
+**Release notes are written, not generated.** Pasting the commit range would be cheap and
+would read like one: commit messages say what was done to the code, while a release note
+has to say what changed for someone printing slips. The commit log is the raw material —
+which is what the one-line-past-tense rule is for — but the text is composed per release.
+
+### What the version means
+
+The contract is **the printed slip**, not an API — nobody pins this app, and the only
+thing a user can be surprised by is paper coming out different.
+
+| | when | example |
+|---|---|---|
+| MAJOR | the printed slip changes | blank geometry, a different default profile, the QR moving |
+| MINOR | a new capability, existing output identical | another interface language, another blank variant, a new field |
+| PATCH | fixes and internals, output byte-identical | a shrink-to-fit bug, a dependency bump, bundle work |
+
+The geometry tests are the arbiter rather than judgement: **if a release had to change
+`tests/layout.spec.ts`, `tests/values.spec.ts` or the reference fixture, it is MAJOR.**
+Those tests exist precisely to notice when the paper moves.
+
+### Cutting a release
+
+The version in `package.json` and the tag must agree — `deploy.yml` stops if they do not,
+because a build labelled with the wrong version is worse than no build.
+
+```bash
+npm version 0.2.0 --no-git-tag-version     # package.json only
+git commit -am 'Released 0.2.0'
+git commit --amend --no-edit -S            # tags and releases are signed
+git push origin main
+git tag -s 0.2.0 -m 0.2.0 && git push origin 0.2.0
+```
+
+Pushing the tag builds, tests and deploys to Cloudflare. The GitHub release is published
+afterwards, by hand, once the deploy is green:
+
+```bash
+gh release create 0.2.0 --title 0.2.0 --notes-file <written notes> --verify-tag
+```
+
+Deliberately not a workflow step. A release published automatically could only carry the
+commit list, and that is the thing this project decided not to ship.
+
+### Still to do by hand, in the repository settings
+
+The `production` environment exists — GitHub creates it from the `environment:` block in
+`deploy.yml` — but carries no rules, and the Cloudflare credentials sit at repository
+scope where every workflow can read them:
+
+- a deployment tag policy on `production`, so only `[0-9]+.[0-9]+.[0-9]+` can deploy.
+  Today that is enforced only by a shell step, which anyone editing the workflow can
+  remove;
+- `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` moved to environment secrets, so a
+  token that can deploy is not readable by a workflow running on a pull request.
+
 ## Not done yet
 
 - Overlay printing onto pre-printed NCR stock (`drawBlank: false` exists in the renderer

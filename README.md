@@ -57,15 +57,25 @@ character that was cut.
 
 ## Deployment
 
-Pushing a tag of the form `x.y.z` builds and publishes to Cloudflare Workers. The tag
-must match `version` in `package.json`, or the workflow stops.
+Pushing a tag of the form `x.y.z` typechecks, tests, builds and publishes to Cloudflare
+Workers. The tag must match `version` in `package.json`, or the workflow stops. The
+GitHub release is published by hand afterwards, with notes written for the release rather
+than generated from the commit list.
 
 ```bash
-npm version 1.0.0 --no-git-tag-version   # bump, commit
-git tag 1.0.0 && git push origin 1.0.0
+npm version 0.2.0 --no-git-tag-version     # package.json only
+git commit -am 'Released 0.2.0'
+git commit --amend --no-edit -S            # releases are signed
+git push origin main
+git tag -s 0.2.0 -m 0.2.0 && git push origin 0.2.0
 ```
 
-Pull requests run the same typecheck, tests and build.
+Versions describe the **printed slip**, which is this app's only contract: MAJOR when
+paper comes out different, MINOR for a capability that leaves existing output identical,
+PATCH for everything else. `CLAUDE.md` has the full rule and the test that arbitrates it.
+
+Work goes straight to `main`; pull requests are for when you want CI's verdict before a
+change lands, and run the same typecheck, tests and build.
 
 `wrangler.toml` holds everything about the deployment: the project name, the assets
 directory and the custom domain. The Worker and its DNS record are created on the first

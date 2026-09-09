@@ -402,6 +402,10 @@ thing a user can be surprised by is paper coming out different.
 | MINOR | a new capability, or geometry corrected **towards** the real blank | another interface language, another blank variant, a field measured into a better position |
 | PATCH | fixes and internals, output byte-identical | a shrink-to-fit bug, a dependency bump, bundle work |
 
+A release that only undoes an error of a previous one is **PATCH**, even though paper
+moves: it restores what should have shipped rather than changing it. `1.3.1` was that —
+`1.3.0` had over-corrected the right column by a quarter of a millimetre.
+
 Moving something on the sheet is MINOR **only when there is a measurement showing the
 new position is closer to the physical blank than the old one**. That is the arbiter, and
 it is what stops "minor" from becoming a licence to nudge things by eye: without such

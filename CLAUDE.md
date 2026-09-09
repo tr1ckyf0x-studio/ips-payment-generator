@@ -37,13 +37,14 @@ into a drawable `FormProfile`. `src/layout/formSpec.ts` holds the two sets of nu
   Measured by `tools/extractGeometry.ts`, frozen into
   `tests/fixtures/reference-geometry.json`, held to 0.25 mm by `tests/layout.spec.ts`.
 - **`optimum`** (default) — the blank printed by OPTIMUM d.o.o., measured from nine
-  scans by `tools/measure_blank.py`. Blocks 90.7 x 15.1 mm against the reference's
-  89.75 x 13.96, pitch 21.2 against 19.45, separator 7.0 mm past the blocks against 6.0.
+  scans by `tools/measure_blank.py`, and placed on the sheet by a card-calibrated
+  flatbed scan. Blocks 90.9 x 15.1 mm against the reference's 89.75 x 13.96, pitch 21.2
+  against 19.45, separator 7.0 mm past the blocks against 6.0.
 
 Scale for the OPTIMUM figures is absolute — from each scan's own page size, not relative
 to the other blank — and the key figures agree across all nine scans. What the scans
-cannot give is the origin: all are cropped, so where the arrangement sits on the sheet is
-inferred from the least-cropped ones (5.5 mm left margin).
+cannot give is the origin: all are cropped. That came later, from a flatbed scan with a
+bank card in the frame — see "Where the arrangement sits on the sheet".
 
 Measuring the scans needed two things earlier attempts got wrong: the rules are printed
 pale, so run-length detection tuned for text misses them entirely (read a brightness
@@ -267,18 +268,38 @@ rest — 3.9 mm each side on OPTIMUM, 1.4 mm on the tighter pausal reference.
 `tests/profiles.spec.ts` holds both blanks to it, and was verified to fail on the old
 placement.
 
-## What the scans still cannot pin down
+## Where the arrangement sits on the sheet
 
-`optimumProfile` reproduces the scans' proportions — the two blanks really do differ,
-the pausal reference being 6 % shorter in the block — and `tests/profiles.spec.ts`
-holds it to the measured figures. What no scan can supply is the **origin**: every one
-is cropped by the camera, so where the arrangement sits on the 210 x 99 mm sheet is
-inferred from the least-cropped ones, at a 5.5 mm left margin.
+The nine photographs gave proportions but never the **origin** — all were cropped, so
+the left margin was a guess at 5.5 mm. A flatbed scan holding the slip and a bank card
+in one frame settled it: the whole printed layout sits **0.77 mm further right** than
+that guess, and the left block is 0.2 mm wider.
 
-That is the residual. `tools/scan_crosscheck.py` compares the one scale-free quantity a
-photograph can carry — the separator's position as a fraction of the block width — and
-reads +1.1 %, about 1 mm, against a scan that itself covers only 205.9 of the 210 mm.
-Closing that would need a scan of an uncut blank on a flatbed, not a photograph.
+Measured, against profile: blocks x0 6.24 (was 5.5), x1 97.16, separator 104.18, block
+width 90.92. Eleven edges of the right column, from x 113 to x 204, agree on the same
+0.73-0.86 mm shift, so it is a translation and not a scale error. Vertically the profile
+was already right — block height 15.1 to 0.03 mm, pitch and tops within 0.35 mm.
+
+**The length standard is the card, not the graph paper.** Graph paper looked like the
+obvious ruler and is not one: measured against the card it is ruled 0.29 % long on one
+axis and 0.20 % short on the other, and not uniformly across the sheet. That
+anisotropy — and not the scanner, which came out isotropic to 0.007 % — is what had
+made two graph-paper scans of the same slip disagree by half a millimetre. An ISO/IEC
+7810 ID-1 card is 85.60 x 53.98 mm to +-0.13 and +-0.055, which is a tighter standard
+than anything printed.
+
+Two routes agree: card-only, and graph paper calibrated by a card in another frame.
+Block width 90.91 against 90.93, pitch 21.08 against 21.08, sheet 209.57 x 96.59 against
+209.86 x 96.61.
+
+Two things worth knowing that fall out of it:
+
+- **The physical slip is 96.6 mm tall, not 99.** Guillotining a three-up sheet costs
+  about 2.4 mm. We print the normative 99 mm cell regardless; a cut slip will simply be
+  a couple of millimetres taller than the print shop's.
+- **This is one sheet.** Press registration drifts between runs, so the absolute origin
+  carries whatever that particular sheet was cut and printed to. The proportions, which
+  come from nine sheets, are the sturdier half.
 
 ## Deployment
 

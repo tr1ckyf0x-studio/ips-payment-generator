@@ -58,28 +58,28 @@ const OPTIMUM: BlankGeometry = {
   id: 'optimum',
   boxStroke: 0.47,
   ruleStroke: 0.35,
-  blocks: { x0: 5.5, x1: 96.21, tops: [12.0, 33.25, 54.23], height: 15.12 },
-  separatorX: 103.23,
+  blocks: { x0: 6.27, x1: 97.19, tops: [12.0, 33.25, 54.23], height: 15.12 },
+  separatorX: 104.21,
   fields: {
-    sifraPlacanja: { x: 112.31, y: 15.24, w: 13.0, h: 6.1 },
-    valuta: { x: 130.31, y: 15.24, w: 13.0, h: 6.1 },
-    iznos: { x: 150.31, y: 15.24, w: 53.0, h: 6.1 },
-    racunPrimaoca: { x: 112.31, y: 28.38, w: 91.0, h: 6.19 },
-    model: { x: 112.31, y: 41.56, w: 13.0, h: 6.1 },
-    pozivNaBroj: { x: 130.31, y: 41.56, w: 73.0, h: 6.1 },
+    sifraPlacanja: { x: 113.08, y: 15.24, w: 13.0, h: 6.1 },
+    valuta: { x: 131.08, y: 15.24, w: 13.0, h: 6.1 },
+    iznos: { x: 151.08, y: 15.24, w: 53.0, h: 6.1 },
+    racunPrimaoca: { x: 113.08, y: 28.38, w: 91.0, h: 6.19 },
+    model: { x: 113.08, y: 41.56, w: 13.0, h: 6.1 },
+    pozivNaBroj: { x: 131.08, y: 41.56, w: 73.0, h: 6.1 },
   },
   rules: {
-    potpis: { x0: 5.5, x1: 61.5, y: 76.5 },
-    mesto: { x0: 48.5, x1: 96.5, y: 85.53 },
-    datum: { x0: 112.5, x1: 147.5, y: 85.53 },
+    potpis: { x0: 6.27, x1: 62.27, y: 76.5 },
+    mesto: { x0: 49.27, x1: 97.27, y: 85.53 },
+    datum: { x0: 113.27, x1: 148.27, y: 85.53 },
   },
-  hitno: { x: 176.3, y: 81.43, w: 5.2, h: 4.1 },
+  hitno: { x: 177.07, y: 81.43, w: 5.2, h: 4.1 },
   // Measured on two clean scans: the title's ink starts 8.6 mm above the first block
   // rule and ends 197.4 mm right of the blocks' left edge.
-  title: { yTop: 3.6, right: 202.92 },
-  footer: { centre: 104.4, yTop: 92.3 },
+  title: { yTop: 3.6, right: 203.69 },
+  footer: { centre: 105.17, yTop: 92.3 },
   // Vertically centred in the band below the framed fields; see `qrArea`.
-  qr: { x: 177.31, size: 26 },
+  qr: { x: 178.08, size: 26 },
 };
 
 export const pausalProfile: FormProfile = createProfile(PAUSAL);

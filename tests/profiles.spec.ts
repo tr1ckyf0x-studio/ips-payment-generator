@@ -179,15 +179,37 @@ describe.each(ids)('the %s blank', (id) => {
 });
 
 describe('the OPTIMUM blank reproduces the scans', () => {
-  // Measured with tools/measure_blank.py across nine scans. Scale is absolute, taken
-  // from each scan's own page size, so these are millimetres and not ratios.
+  // Proportions from nine scans with tools/measure_blank.py; absolute position and scale
+  // from a flatbed scan holding the slip and an ISO/IEC 7810 ID-1 card in one frame. The
+  // card is the only length standard in the chain: graph paper turned out to be ruled
+  // 0.3 % long on one axis and 0.2 % short on the other, which is what had made the
+  // earlier figures disagree with themselves.
   const boxes = optimumProfile.primitives.filter((p): p is Box => p.kind === 'box');
   const rules = optimumProfile.primitives.filter((p): p is Rule => p.kind === 'rule');
   const blockTop = rules.filter((r) => r.id.endsWith('-top')).sort((a, b) => a.y0 - b.y0);
 
-  it('has blocks 90.7 mm wide, against the reference 89.75', () => {
+  it('has blocks 90.9 mm wide, against the reference 89.75', () => {
     const top = blockTop[0];
-    expect(Math.abs(top.x1 - top.x0)).toBeCloseTo(90.71, 1);
+    expect(Math.abs(top.x1 - top.x0)).toBeCloseTo(90.92, 1);
+  });
+
+  it('starts the blocks 6.3 mm from the left edge of the sheet', () => {
+    // The one figure no cropped photograph could give. Two scans agree to 0.11 mm, one
+    // measured against the card directly and one against card-calibrated graph paper.
+    expect(blockTop[0].x0).toBeCloseTo(6.24, 1);
+  });
+
+  it('ends the right column 204.1 mm across, 6 mm short of the sheet', () => {
+    // The whole layout sits ~0.77 mm right of where cropped scans had implied, and the
+    // right column is where that shows: eleven edges from x 113 to x 204 agree on it.
+    const right = (id: string) => {
+      const box = boxes.find((b) => b.id === id)!;
+      return box.x + box.w;
+    };
+    for (const id of ['iznos', 'racunPrimaoca', 'pozivNaBroj']) {
+      expect(right(id), id).toBeCloseTo(204.1, 1);
+    }
+    expect(boxes.find((b) => b.id === 'sifraPlacanja')!.x).toBeCloseTo(113.1, 1);
   });
 
   it('has blocks 15.1 mm tall, against the reference 13.96', () => {

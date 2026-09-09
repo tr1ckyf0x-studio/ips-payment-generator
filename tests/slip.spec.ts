@@ -50,6 +50,28 @@ describe('account formatting', () => {
   it('strips everything but digits for the QR payload', () => {
     expect(accountDigits('845-0000000404849-87')).toBe('845000000040484987');
   });
+
+  // The three worked examples the recommendations use to state the rule for tag R,
+  // `references/ips/nbs-preporuke-validacija.pdf`, item 10. An invoice prints the middle
+  // part without its leading zeros, and the QR wants all eighteen digits.
+  it.each([
+    ['840-955845-10', '840000000095584510'],
+    ['165-55-74', '165000000000005574'],
+    ['310-1234567891211-86', '310123456789121186'],
+  ])('pads %s to the eighteen digits the QR needs', (written, expected) => {
+    expect(accountDigits(written)).toBe(expected);
+  });
+
+  it('prints a short account expanded, so paper and QR cannot disagree', () => {
+    expect(formatAccount('165-55-74')).toBe('165-0000000000055-74');
+    expect(accountDigits(formatAccount('165-55-74'))).toBe(accountDigits('165-55-74'));
+  });
+
+  it('pads only the middle part, since the bank and control lengths are fixed', () => {
+    // Padding a two-digit control number would turn a typo into a plausible account.
+    expect(accountDigits('16-55-74')).toBe('165574');
+    expect(accountDigits('165-55-7')).toBe('165557');
+  });
 });
 
 describe('block fields', () => {

@@ -55,7 +55,7 @@ export const sr: Translation = {
     purpose: 'Svrha uplate',
     purposeHint: 'svrha uplate',
     account: 'Račun primaoca',
-    accountHint: 'račun primaoca — 18 cifara',
+    accountHint: 'račun primaoca — kao na računu, npr. 165-55-74',
     recipient: 'Primalac',
     recipientHint: 'primalac',
     model: 'Model',
@@ -79,7 +79,8 @@ export const sr: Translation = {
     model: 'Model',
   },
   ips: {
-    accountDigits: 'račun primaoca mora imati 18 cifara, trenutno {{count}}',
+    accountDigits:
+      'račun primaoca nema 18 cifara — unesite ga kao na računu, npr. 165-55-74, ili u celosti; trenutno {{count}}',
     recipientRequired: 'primalac je obavezan za QR kôd',
     tooLong: 'najviše {{limit}} znakova, trenutno {{count}}',
     amountRequired: 'iznos je obavezan i mora biti broj, na primer 5.200,00',

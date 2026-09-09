@@ -67,14 +67,42 @@ export function blockLines(text: string): string[] {
   return text.split('\n').slice(0, MAX_BLOCK_LINES);
 }
 
-/** Formats an 18-digit account as XXX-XXXXXXXXXXXXX-XX; passes anything else through. */
-export function formatAccount(raw: string): string {
-  const digits = raw.replace(/\D/g, '');
-  if (digits.length !== 18) return raw;
-  return `${digits.slice(0, 3)}-${digits.slice(3, 16)}-${digits.slice(16)}`;
+/**
+ * A Serbian account written bank-account-control, with the middle part as printed.
+ *
+ * Invoices give the middle part without its leading zeros — 165-55-74, never
+ * 165-0000000000055-74 — while the QR wants all eighteen digits. The bank code is
+ * always three and the control number always two, so only the middle is variable.
+ */
+const DASHED_ACCOUNT = /^(\d{3})-(\d{1,13})-(\d{2})$/;
+
+/**
+ * The account as the IPS QR wants it: eighteen bare digits, no dashes.
+ *
+ * The recommendations state the rule for tag R by worked example
+ * (`references/ips/nbs-preporuke-validacija.pdf`, item 10): 840-955845-10 becomes
+ * 840000000095584510, and 165-55-74 becomes 165000000000005574. The middle part is
+ * padded to thirteen digits and the three parts are concatenated.
+ *
+ * Anything that is not in that shape falls back to its bare digits, so eighteen typed
+ * straight through still works, and a malformed entry keeps its own length for the
+ * error message to report.
+ */
+export function accountDigits(raw: string): string {
+  const parts = DASHED_ACCOUNT.exec(raw.trim());
+  if (parts) return parts[1] + parts[2].padStart(13, '0') + parts[3];
+  return raw.replace(/\D/g, '');
 }
 
-/** The account as the IPS QR wants it: bare digits. */
-export function accountDigits(raw: string): string {
-  return raw.replace(/\D/g, '');
+/**
+ * The account as it is printed on the slip: XXX-XXXXXXXXXXXXX-XX.
+ *
+ * Built from `accountDigits`, so a short entry is expanded on paper exactly as it is in
+ * the QR — the two must not disagree about what is being paid. Anything that does not
+ * resolve to eighteen digits is printed as typed rather than mangled.
+ */
+export function formatAccount(raw: string): string {
+  const digits = accountDigits(raw);
+  if (digits.length !== 18) return raw;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 16)}-${digits.slice(16)}`;
 }

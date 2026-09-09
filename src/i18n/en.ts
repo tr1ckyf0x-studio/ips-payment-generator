@@ -52,7 +52,7 @@ export const en: Translation = {
     purpose: 'Purpose of payment',
     purposeHint: 'svrha uplate',
     account: "Recipient's account",
-    accountHint: 'račun primaoca — 18 digits',
+    accountHint: 'račun primaoca — as printed, e.g. 165-55-74',
     recipient: 'Recipient',
     recipientHint: 'primalac',
     model: 'Model',
@@ -76,7 +76,8 @@ export const en: Translation = {
     model: 'Model',
   },
   ips: {
-    accountDigits: "the recipient's account must be 18 digits, currently {{count}}",
+    accountDigits:
+      "the recipient's account does not make 18 digits — write it as printed, like 165-55-74, or in full; currently {{count}}",
     recipientRequired: 'the recipient is required for the QR code',
     tooLong: 'no more than {{limit}} characters, currently {{count}}',
     amountRequired: 'the amount is required and must be a number, for example 5.200,00',

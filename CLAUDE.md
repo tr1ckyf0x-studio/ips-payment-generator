@@ -220,6 +220,18 @@ Payload per `references/ips/nbs-preporuke-validacija.pdf`, built in `src/ips/pay
 Drawn as vector rectangles (runs of dark modules merged) at 30 x 30 mm in the lower-right
 quadrant — the only free space on a blank that predates instant payments.
 
+**The account is padded, not just stripped.** Tag R takes eighteen bare digits, but an
+invoice prints the middle part without its leading zeros — `165-55-74`, never
+`165-0000000000055-74`. The recommendations give the rule by worked example (item 10):
+the bank code is three digits, the control number two, and the middle is padded to
+thirteen. `accountDigits()` implements it and `tests/slip.spec.ts` holds it to all three
+of the document's examples. Requiring eighteen typed digits, as this did at first,
+rejects most real accounts as they are written.
+
+`formatAccount()` is built on the same function, so a short entry is expanded on paper
+exactly as it is in the QR. The printed field and the code must not disagree about what
+is being paid.
+
 **Two rules are not in the written recommendations and were found by probing the NBS
 validator:**
 

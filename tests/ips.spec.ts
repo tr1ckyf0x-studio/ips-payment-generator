@@ -145,8 +145,18 @@ describe('payload assembly', () => {
     expect(text).toContain('R:845000000040484987');
   });
 
+  it('accepts an account written the short way an invoice prints it', () => {
+    // 265-123-45 is well formed: the middle part is padded to thirteen digits, per the
+    // recommendations' own examples. It used to be refused, which rejected most real
+    // accounts as typed.
+    const { text, problems } = buildIpsPayload(slip({ racunPrimaoca: '265-123-45' }));
+    expect(problems.filter((p) => p.field === 'racunPrimaoca')).toEqual([]);
+    expect(text).toContain('R:265000000000012345');
+  });
+
   it.each([
-    ['account of the wrong length', { racunPrimaoca: '265-123-45' }, 'racunPrimaoca'],
+    ['an account that cannot make eighteen digits', { racunPrimaoca: '845-4849' }, 'racunPrimaoca'],
+    ['an account with too long a middle part', { racunPrimaoca: '265-12345678901234-45' }, 'racunPrimaoca'],
     ['no recipient', { primalac: '' }, 'primalac'],
     ['no amount', { iznos: '' }, 'iznos'],
     ['incomplete payment code', { osnovPlacanja: '' }, 'sifraPlacanja'],

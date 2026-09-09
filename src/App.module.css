@@ -136,3 +136,25 @@
     border-bottom: 1px solid var(--line);
   }
 }
+
+/* Sits at the end of the scrolling editor column, after the last slip. */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.footer a {
+  color: inherit;
+}
+
+.footer a:hover {
+  color: var(--text);
+}

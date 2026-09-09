@@ -39,6 +39,9 @@ export const ru = {
     language: 'Язык',
     documentTitle: 'Налог за уплату — генератор платёжек',
   },
+  footer: {
+    source: 'Исходный код на GitHub',
+  },
   preview: {
     title: 'Предпросмотр',
     updating: 'обновляется…',

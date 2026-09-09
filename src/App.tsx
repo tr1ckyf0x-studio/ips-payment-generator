@@ -204,6 +204,17 @@ export function App() {
             onDuplicate={() => duplicate(index)}
           />
         ))}
+
+        <footer className={styles.footer}>
+          <a
+            href="https://github.com/tr1ckyf0x-studio/ips-payment-generator"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('footer.source')}
+          </a>
+          <span>© {new Date().getFullYear()} Vladislav Lisianskii</span>
+        </footer>
       </aside>
 
       <main className={styles.preview}>

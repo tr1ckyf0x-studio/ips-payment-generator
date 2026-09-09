@@ -31,6 +31,9 @@ export const en: Translation = {
     language: 'Language',
     documentTitle: 'Nalog za uplatu — payment slip generator',
   },
+  footer: {
+    source: 'Source code on GitHub',
+  },
   preview: {
     title: 'Preview',
     updating: 'updating…',

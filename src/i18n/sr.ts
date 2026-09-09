@@ -34,6 +34,9 @@ export const sr: Translation = {
     language: 'Jezik',
     documentTitle: 'Nalog za uplatu — generator naloga',
   },
+  footer: {
+    source: 'Izvorni kôd na GitHub-u',
+  },
   preview: {
     title: 'Pregled',
     updating: 'osvežava se…',

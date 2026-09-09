@@ -241,12 +241,15 @@ describe('the OPTIMUM blank reproduces the scans', () => {
   });
 
   it('sits the right column where the overlay put it', () => {
-    // The same overlay showed every row of the right column 0.37 mm low — six rules,
-    // all the same sign. These are the corrected positions.
+    // The overlay showed the right column 0.13 mm low, measured on the boxes' own
+    // vertical edges. Measuring their horizontal rules instead read 0.37 — the wide
+    // window took in the captions above each box, which are black on our print and pale
+    // brown on the blank, so the two slips' rows were pulled by different amounts. The
+    // vertical edges carry no caption and are the honest measurement.
     const y = (id: string) => boxes.find((b) => b.id === id)!.y;
-    expect(y('sifraPlacanja')).toBeCloseTo(14.87, 2);
-    expect(y('racunPrimaoca')).toBeCloseTo(28.01, 2);
-    expect(y('model')).toBeCloseTo(41.19, 2);
+    expect(y('sifraPlacanja')).toBeCloseTo(15.11, 2);
+    expect(y('racunPrimaoca')).toBeCloseTo(28.25, 2);
+    expect(y('model')).toBeCloseTo(41.43, 2);
     expect(y('valuta')).toBe(y('sifraPlacanja'));
     expect(y('pozivNaBroj')).toBe(y('model'));
   });

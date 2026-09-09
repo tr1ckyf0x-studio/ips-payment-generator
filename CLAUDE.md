@@ -301,8 +301,18 @@ The left column — everything the card-calibrated measurement had fixed — cam
 
 Two things were wrong and are now corrected:
 
-- **The right column sat 0.37 mm low.** All six of its rules agreed on the sign
-  (+0.25 to +0.51), so the three framed rows moved up by that much.
+- **The right column sat 0.13 mm low**, so the three framed rows moved up by that much.
+
+  The first reading said 0.37, and `1.3.0` shipped that. It was measured on the rows'
+  horizontal rules through a wide window, which also took in the caption above each box —
+  black on our print, pale brown on the blank, so the two slips' rows were pulled by
+  different amounts. Measured instead on the boxes' own **vertical edges**, which carry no
+  caption, the three rows read +0.13, +0.06 and +0.19. `1.3.0` therefore over-corrected by
+  about a quarter of a millimetre, and `1.3.1` put it back.
+
+  The lesson is narrow and worth keeping: when comparing two prints of the same thing,
+  measure a feature that exists in both and is surrounded by the same things in both. A
+  window wide enough to catch neighbouring ink measures the neighbours.
 - **The model box was 13 mm and should be 10.** The next box does not move; the gap
   between them opens from 5 mm to 8. A card-calibrated scan had read 10.01 mm for it
   earlier and I put it down to a stroke of text — two scans agreeing settled it.

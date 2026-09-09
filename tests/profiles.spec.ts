@@ -226,6 +226,31 @@ describe('the OPTIMUM blank reproduces the scans', () => {
     expect(separator.x0 - blockTop[0].x1).toBeCloseTo(7.02, 1);
   });
 
+  it('makes the model box narrower than the one above it', () => {
+    // Printing this blank and scanning it on top of a real one showed the model box
+    // 3 mm too wide: 13.02 mm against 9.97. A second scan, calibrated against a card,
+    // had read 10.01. The box above it — šifra plaćanja — really is 13 mm on both.
+    const width = (id: string) => boxes.find((b) => b.id === id)!.w;
+    expect(width('model')).toBeCloseTo(10.0, 1);
+    expect(width('sifraPlacanja')).toBeCloseTo(13.0, 1);
+
+    // The next box does not move; the gap between them opens up instead.
+    const model = boxes.find((b) => b.id === 'model')!;
+    const poziv = boxes.find((b) => b.id === 'pozivNaBroj')!;
+    expect(poziv.x - (model.x + model.w)).toBeCloseTo(8.0, 1);
+  });
+
+  it('sits the right column where the overlay put it', () => {
+    // The same overlay showed every row of the right column 0.37 mm low — six rules,
+    // all the same sign. These are the corrected positions.
+    const y = (id: string) => boxes.find((b) => b.id === id)!.y;
+    expect(y('sifraPlacanja')).toBeCloseTo(14.87, 2);
+    expect(y('racunPrimaoca')).toBeCloseTo(28.01, 2);
+    expect(y('model')).toBeCloseTo(41.19, 2);
+    expect(y('valuta')).toBe(y('sifraPlacanja'));
+    expect(y('pozivNaBroj')).toBe(y('model'));
+  });
+
   it('makes the framed fields 6.1 mm tall, against the reference 5.98', () => {
     for (const id of ['sifraPlacanja', 'valuta', 'iznos', 'model', 'pozivNaBroj']) {
       expect(boxes.find((b) => b.id === id)!.h, id).toBeCloseTo(6.1, 1);

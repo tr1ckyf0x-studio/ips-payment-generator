@@ -284,6 +284,31 @@ rest — 3.9 mm each side on OPTIMUM, 1.4 mm on the tighter pausal reference.
 `tests/profiles.spec.ts` holds both blanks to it, and was verified to fail on the old
 placement.
 
+## Checked against paper
+
+The blank was printed and scanned lying on a real one, both slips in the same frame so
+the scanner's scale cancels and only their difference matters. Measured relative to each
+slip's own first block rule, so where each sheet sat on the glass cancels too.
+
+The left column — everything the card-calibrated measurement had fixed — came out right:
+
+| | printed | real blank | difference |
+|---|---:|---:|---:|
+| block width | 90.93 | 90.77 | +0.16 |
+| block height | 15.11 | 15.12 | −0.01 |
+| block pitch | 21.16 | 21.10 | +0.06 |
+| separator past block | 7.06 | 7.01 | +0.04 |
+
+Two things were wrong and are now corrected:
+
+- **The right column sat 0.37 mm low.** All six of its rules agreed on the sign
+  (+0.25 to +0.51), so the three framed rows moved up by that much.
+- **The model box was 13 mm and should be 10.** The next box does not move; the gap
+  between them opens from 5 mm to 8. A card-calibrated scan had read 10.01 mm for it
+  earlier and I put it down to a stroke of text — two scans agreeing settled it.
+
+`tests/profiles.spec.ts` holds both, and was verified to fail on the old numbers.
+
 ## Where the arrangement sits on the sheet
 
 The nine photographs gave proportions but never the **origin** — all were cropped, so

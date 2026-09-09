@@ -61,12 +61,14 @@ const OPTIMUM: BlankGeometry = {
   blocks: { x0: 6.27, x1: 97.19, tops: [12.0, 33.25, 54.23], height: 15.12 },
   separatorX: 104.21,
   fields: {
-    sifraPlacanja: { x: 113.08, y: 15.24, w: 13.0, h: 6.1 },
-    valuta: { x: 131.08, y: 15.24, w: 13.0, h: 6.1 },
-    iznos: { x: 151.08, y: 15.24, w: 53.0, h: 6.1 },
-    racunPrimaoca: { x: 113.08, y: 28.38, w: 91.0, h: 6.19 },
-    model: { x: 113.08, y: 41.56, w: 13.0, h: 6.1 },
-    pozivNaBroj: { x: 131.08, y: 41.56, w: 73.0, h: 6.1 },
+    // Rows sit 0.37 mm higher and the model box is 10 mm, both measured by printing this
+    // blank and scanning it on top of a real one — see "Checked against paper".
+    sifraPlacanja: { x: 113.08, y: 14.87, w: 13.0, h: 6.1 },
+    valuta: { x: 131.08, y: 14.87, w: 13.0, h: 6.1 },
+    iznos: { x: 151.08, y: 14.87, w: 53.0, h: 6.1 },
+    racunPrimaoca: { x: 113.08, y: 28.01, w: 91.0, h: 6.19 },
+    model: { x: 113.08, y: 41.19, w: 10.0, h: 6.1 },
+    pozivNaBroj: { x: 131.08, y: 41.19, w: 73.0, h: 6.1 },
   },
   rules: {
     potpis: { x0: 6.27, x1: 62.27, y: 76.5 },

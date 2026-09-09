@@ -8,3 +8,4 @@ references/scans/
 .visual/
 __pycache__/
 *.tsbuildinfo
+.vite/

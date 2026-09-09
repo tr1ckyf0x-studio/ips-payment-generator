@@ -91,6 +91,30 @@ it over the repository's own copy would cut a subset out of a subset and lose ch
 irrecoverably. `tests/fonts.spec.ts` checks coverage: a missing glyph does not throw, it
 just prints nothing, so nothing else would catch it.
 
+## The standard PDF fonts are stubbed out
+
+`@pdf-lib/standard-fonts` carries the AFM metrics of the fourteen fonts every reader
+already has, and cost 127 kB of the bundle — 7 % — for data this app never reads: the
+blank must print identically everywhere, so all three faces are embedded. It arrives
+because `pdf-lib/utils/objects` evaluates `values(FontNames)` at module scope, which
+pulls in `Font.js` and its fourteen compressed JSON files. Tree shaking cannot see past
+that.
+
+`vite.config.ts` aliases the package to `src/pdf/standardFonts.ts`, which keeps
+`FontNames` and the encoding tables real and replaces only `Font.load` with a throw.
+The alias is anchored (`/^@pdf-lib\/standard-fonts$/`) because a bare string alias also
+rewrites deep paths, and the stub imports one to keep the encoding tables.
+
+**The guard is on the artifact, not the module graph.** vitest loads `pdf-lib` from its
+CommonJS build, outside vite's transform, so the alias never reaches it in a test — a
+test importing `pdf-lib` gets the real package and would pass either way.
+`tests/bundle.spec.ts` builds and looks for the compressed AFM payloads instead: each
+font is a zlib stream in base64, so a long run beginning `eJy` is font data and nothing
+else. Twelve before the alias, none after; verified to fail when the alias is removed.
+
+Anyone calling `embedStandardFont` now gets an exception naming the cause, which beats a
+slip typeset in metrics the layout was never calibrated against.
+
 ## Fitting long values
 
 Fields cannot grow, so `src/layout/fitText.ts` scales a value down until its widest

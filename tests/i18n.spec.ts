@@ -9,7 +9,12 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LANGUAGES, type Language } from '../src/i18n/index.ts';
-import { PAYMENT_FORMS, PAYMENT_GROUNDS, REFERENCE_MODELS } from '../src/data/paymentCodes.ts';
+import {
+  describeCode,
+  PAYMENT_FORMS,
+  PAYMENT_GROUNDS,
+  REFERENCE_MODELS,
+} from '../src/data/paymentCodes.ts';
 
 const codes = Object.keys(LANGUAGES) as Language[];
 
@@ -50,6 +55,39 @@ describe.each(codes)('the %s locale', (code) => {
         expect(entry.sr, `sr gloss for ${entry.value}`).toBeTruthy();
         expect(entry.ru, `ru gloss for ${entry.value}`).toBeTruthy();
         expect(entry.en, `en gloss for ${entry.value}`).toBeTruthy();
+      }
+    }
+  });
+});
+
+describe('describeCode', () => {
+  const cash = PAYMENT_FORMS.find((c) => c.value === '1')!;
+
+  it.each([
+    ['ru', 'Наличными'],
+    ['en', 'Cash'],
+    ['sr', 'Gotovinski'],
+  ])('describes a code in %s', (language, expected) => {
+    expect(describeCode(cash, language)).toBe(expected);
+  });
+
+  it('ignores the region subtag a browser may report', () => {
+    // The detector is set to languageOnly, but resolvedLanguage is not guaranteed to be
+    // bare, and a regional tag falling through to Serbian would be silent.
+    expect(describeCode(cash, 'en-US')).toBe('Cash');
+    expect(describeCode(cash, 'ru-RS')).toBe('Наличными');
+  });
+
+  it('falls back to the official Serbian for a language it does not gloss', () => {
+    expect(describeCode(cash, 'de')).toBe(cash.sr);
+  });
+
+  it('describes every code in every language, never emptily', () => {
+    for (const list of [PAYMENT_FORMS, PAYMENT_GROUNDS, REFERENCE_MODELS]) {
+      for (const entry of list) {
+        for (const language of ['ru', 'sr', 'en']) {
+          expect(describeCode(entry, language).trim(), `${language} ${entry.value}`).not.toBe('');
+        }
       }
     }
   });

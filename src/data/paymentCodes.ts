@@ -11,10 +11,23 @@ export interface Code {
   value: string;
   /** Official Serbian wording. */
   sr: string;
-  /** Russian gloss for the form's hint text. */
+  /** Russian gloss. */
   ru: string;
   /** English gloss. The Serbian wording stays authoritative; these only explain it. */
   en: string;
+}
+
+/**
+ * The description to show for a code in a given interface language.
+ *
+ * Serbian doubles as the fallback rather than being one branch of three: a language we
+ * do not gloss gets the wording the decision itself uses, which is the one the bank
+ * works from. The tag is cut at the first subtag so a browser reporting `en-US` is
+ * still English.
+ */
+export function describeCode(code: Code, language: string): string {
+  const tag = language.split('-')[0];
+  return tag === 'ru' || tag === 'en' ? code[tag] : code.sr;
 }
 
 /** First digit: klasifikacija prema obliku plaćanja. */

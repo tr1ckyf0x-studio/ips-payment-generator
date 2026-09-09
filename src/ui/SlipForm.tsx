@@ -5,7 +5,13 @@
  * can be matched to the printed form at a glance.
  */
 import { useTranslation } from 'react-i18next';
-import { PAYMENT_FORMS, PAYMENT_GROUNDS, REFERENCE_MODELS } from '../data/paymentCodes.ts';
+import {
+  describeCode,
+  PAYMENT_FORMS,
+  PAYMENT_GROUNDS,
+  REFERENCE_MODELS,
+  type Code,
+} from '../data/paymentCodes.ts';
 import { MAX_BLOCK_LINES, type Slip } from '../model/slip.ts';
 import styles from './SlipForm.module.css';
 
@@ -20,9 +26,18 @@ interface Props {
 
 export function SlipForm({ slip, index, removable, onChange, onRemove, onDuplicate }: Props) {
   const { t, i18n } = useTranslation();
-  /** Payment codes carry their official Serbian wording plus a gloss per language. */
-  const gloss = (c: { ru: string; en: string; sr: string }) =>
-    i18n.language === 'ru' ? c.ru : i18n.language === 'en' ? c.en : c.sr;
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  /**
+   * A code reads as its number and its description in the interface language, with the
+   * official Serbian wording on hover — that is the one printed on a Serbian invoice,
+   * so it has to stay reachable even when the interface is not Serbian.
+   */
+  const codeOptions = (codes: Code[]) =>
+    codes.map((c) => (
+      <option key={c.value} value={c.value} title={c.sr}>
+        {c.value} — {describeCode(c, language)}
+      </option>
+    ));
 
   function set<K extends keyof Slip>(key: K, value: Slip[K]) {
     onChange({ ...slip, [key]: value });
@@ -66,11 +81,7 @@ export function SlipForm({ slip, index, removable, onChange, onRemove, onDuplica
               <small>{t('slip.paymentFormHint')}</small>
               <select value={slip.oblikPlacanja} onChange={(e) => set('oblikPlacanja', e.target.value)}>
                 <option value="">{t('slip.none')}</option>
-                {PAYMENT_FORMS.map((c) => (
-                  <option key={c.value} value={c.value} title={gloss(c)}>
-                    {c.value} — {c.sr}
-                  </option>
-                ))}
+                {codeOptions(PAYMENT_FORMS)}
               </select>
             </label>
 
@@ -79,11 +90,7 @@ export function SlipForm({ slip, index, removable, onChange, onRemove, onDuplica
               <small>{t('slip.paymentGroundHint')}</small>
               <select value={slip.osnovPlacanja} onChange={(e) => set('osnovPlacanja', e.target.value)}>
                 <option value="">{t('slip.none')}</option>
-                {PAYMENT_GROUNDS.map((c) => (
-                  <option key={c.value} value={c.value} title={gloss(c)}>
-                    {c.value} — {c.sr}
-                  </option>
-                ))}
+                {codeOptions(PAYMENT_GROUNDS)}
               </select>
             </label>
           </div>
@@ -157,8 +164,9 @@ export function SlipForm({ slip, index, removable, onChange, onRemove, onDuplica
             <span>{t('slip.model')}</span>
             <small>{t('slip.modelHint')}</small>
             <select value={slip.model} onChange={(e) => set('model', e.target.value)}>
+              {/* Only the number fits this narrow select, so the description stays a tooltip. */}
               {REFERENCE_MODELS.map((c) => (
-                <option key={c.value || 'none'} value={c.value} title={gloss(c)}>
+                <option key={c.value || 'none'} value={c.value} title={describeCode(c, language)}>
                   {c.value || t('slip.none')}
                 </option>
               ))}

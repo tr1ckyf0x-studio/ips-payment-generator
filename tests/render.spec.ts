@@ -11,6 +11,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { PDFDocument, PrintScaling } from 'pdf-lib';
 import { extractGeometry } from '../tools/extractGeometry.ts';
 import { pausalProfile } from '../src/layout/formSpec.ts';
 import { renderDocument } from '../src/pdf/renderer.ts';
@@ -157,5 +158,18 @@ describe('rendered PDF', () => {
       expect(Math.min(line.y0, line.y1)).toBeGreaterThanOrEqual(MARGIN);
       expect(Math.max(line.y0, line.y1)).toBeLessThanOrEqual(A4_HEIGHT - MARGIN);
     }
+  });
+
+  it('asks the reader not to rescale it when printing', async () => {
+    // The whole point of this document is that it comes out 210 x 99 mm, and every
+    // print dialog offers to fit it to the page instead. Acrobat and Preview honour
+    // `/PrintScaling /None` and open at actual size; Chrome ignores it, which is why
+    // the form says so in words as well. Asking costs one dictionary entry.
+    const pdf = await PDFDocument.load(await renderDocument([slip(1)], {
+      profile: pausalProfile,
+      fonts,
+    }).then((r) => r.bytes));
+
+    expect(pdf.catalog.getViewerPreferences()?.getPrintScaling()).toBe(PrintScaling.None);
   });
 });

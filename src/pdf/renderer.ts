@@ -5,7 +5,7 @@
  * where our top-left origin becomes pdf-lib's bottom-left one. Everything upstream
  * works in millimetres from the top-left of a slip; `place()` is the only conversion.
  */
-import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
+import { PDFDocument, PrintScaling, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { FieldSlot, FormProfile, Mm, Primitive, QrArea } from '../layout/types.ts';
 import { A4_HEIGHT, A4_WIDTH, paginate } from '../layout/paginate.ts';
@@ -227,6 +227,12 @@ export async function renderDocument(slips: Slip[], options: RenderOptions): Pro
 
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
+
+  // The document asks not to be rescaled when printed. A slip fitted to the page stops
+  // being 210 x 99 mm, and a print dialog is where that is easiest to leave switched on.
+  // Acrobat and Preview honour this; Chrome ignores it, which is why the form still says
+  // so in words. Asking costs one dictionary entry.
+  pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
   const regular = await pdf.embedFont(fonts.regular, { subset: true });
   const bold = await pdf.embedFont(fonts.bold, { subset: true });
   const narrow = await pdf.embedFont(fonts.narrow, { subset: true });

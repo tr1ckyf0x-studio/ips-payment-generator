@@ -5,6 +5,11 @@ on:
   push:
     tags: ['[0-9]+.[0-9]+.[0-9]+']
 
+# Checking out is all the repository token is for; Cloudflare is reached with its own
+# credentials, and the release is published by hand afterwards.
+permissions:
+  contents: read
+
 concurrency:
   group: deploy
   cancel-in-progress: false

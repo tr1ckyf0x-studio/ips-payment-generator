@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
 
+# Nothing here writes anything: it builds and it tests. The organisation's default hands
+# every run a token that can write to the repository, which this does not need and should
+# not carry. Stated in the file so it holds wherever the repository ends up.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

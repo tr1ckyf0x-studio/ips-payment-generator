@@ -383,8 +383,21 @@ not exist — an unlimited supply of duplicate pages, and a soft 404 to anything
 it. There were never any client-side routes to justify it. `html_handling` is now spelled
 out too, since it is what lets a hand-typed `/sr` reach `/sr/index.html`.
 
+**The link card's picture is generated, not drawn.** Sharing the address produced a bare
+link because there was no `og:image` at all. `npm run og` builds `public/og.png` from a
+real rendered slip — the sheet cropped to its top cell, laid on the site's own dark ground
+— so the card cannot advertise something the generator no longer produces. The page is
+sized 1200 x 630 *points* and rasterised at 72 dpi, which lands on exactly that many
+pixels without resampling.
+
+Two things that were not obvious while writing it: cropping the sheet with `setMediaBox`
+leaves the content where it was and it draws off the top of the picture — `embedPage`
+with a bounding box brings its own translation and is the way. And the slip carries no
+background of its own, so on a dark ground its black rules all but vanish; a white
+rectangle goes under it first.
+
 `public/` carries `robots.txt`, `sitemap.xml` listing the three pages with their
-alternates, an SVG icon and the 404 page.
+alternates, an SVG icon, that picture and the 404 page.
 
 Still to do, and neither is code: verify the domain in Google Search Console and submit
 the sitemap, and get a link to the site from somewhere Google already crawls. Nothing

@@ -53,6 +53,7 @@ character that was cut.
 | `npm run fonts` | Renders the same slip in each candidate face for comparison (downloads the rejected faces on first run) |
 | `npm run fixture` | Re-snapshots the reference geometry — adopting a new reference, not a way to fix a failing test |
 | `npm run ips:verify` | Checks IPS payloads against the National Bank's live validator (network; rate-limited) |
+| `npm run og` | Rebuilds the link-preview picture from a real rendered slip |
 | `npm run fonts:subset` | Re-cuts the bundled fonts to the characters the app can print (fetches the originals) |
 
 `CLAUDE.md` explains the design decisions and the measurements behind them;

@@ -61,6 +61,18 @@ describe.each(languages)('the %s page', (language) => {
     expect(byLang['x-default'], 'no x-default').toBe(urlFor('ru'));
   });
 
+  it('offers a picture for a link card', () => {
+    // Without one a messenger shows a bare link, which is what prompted this. The size
+    // is stated so a scraper need not fetch the file to lay the card out.
+    const meta = (property: string) =>
+      attribute(html, new RegExp(`<meta property="${property}" content="([^"]+)"`));
+    expect(meta('og:image')).toBe(`${SITE_ORIGIN}/og.png`);
+    expect(meta('og:image:width')).toBe('1200');
+    expect(meta('og:image:height')).toBe('630');
+    expect(meta('og:image:alt'), 'no alt text').toBeTruthy();
+    expect(html).toContain('name="twitter:card" content="summary_large_image"');
+  });
+
   it('says what the page is before any script runs', () => {
     // The crawler's first pass sees this and nothing else; React replaces it on mount.
     const intro = /<div class="intro">([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';

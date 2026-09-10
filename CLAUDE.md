@@ -319,6 +319,38 @@ Two things were wrong and are now corrected:
 
 `tests/profiles.spec.ts` holds both, and was verified to fail on the old numbers.
 
+### How close is close enough
+
+**Half a millimetre.** The blank is accepted at that, and corrections smaller than it are
+not worth making. A payment is read from the QR or from the printed digits; nothing at a
+bank counter depends on a tenth of a millimetre, and the slip is cut by a guillotine that
+varies by more than that anyway.
+
+This is a decision, not a limit of the tools, and it exists because chasing tighter than
+half a millimetre went wrong twice in one day. Both times the number was an artefact of
+how it was measured:
+
+- **0.37 mm that was really 0.13.** Measured over the rows' horizontal rules through a
+  window wide enough to include the caption above each box — black on our print, pale
+  brown on the blank, so the two were pulled by different amounts. `1.3.0` shipped the
+  over-correction and `1.3.1` took it back.
+- **1.9 mm that cannot exist.** A later overlay put the right column 1.9 mm from where
+  this very repository draws it — a figure matching no version the project has ever had.
+  The comparison spans sixty millimetres horizontally, so a fraction of a degree of skew
+  moves it by that much, and the skew detector was itself broken: it reported 1.52° for a
+  PDF rendered straight from this code, where there is none.
+
+The trap in both is the same, and it is worth naming: **features were identified by their
+order** — the third vertical rule from the left — so one stray edge from a paper edge or a
+stroke of text shifted every index after it. Anything measured this way again should find
+each feature in a window around where the profile says it belongs, and should measure skew
+before comparing anything across the width of the sheet.
+
+What is settled, and settled well: the left column matches the real blank to 0.03 mm in
+both block height and pitch, and the right column's own internal spacing matches to
+0.06 mm. Where each column sits relative to the other is known to about half a millimetre,
+which is the tolerance above.
+
 ## Where the arrangement sits on the sheet
 
 The nine photographs gave proportions but never the **origin** — all were cropped, so
@@ -560,3 +592,5 @@ the token, and cost a click on every release.
 
 - Overlay printing onto pre-printed NCR stock (`drawBlank: false` exists in the renderer
   but is unused and would need per-printer calibration).
+- Reading an existing IPS QR and filling the form from it — the inverse of what
+  `payload.ts` already does, and `jsqr` is already a dependency.

@@ -695,5 +695,13 @@ the token, and cost a click on every release.
 
 - Overlay printing onto pre-printed NCR stock (`drawBlank: false` exists in the renderer
   but is unused and would need per-printer calibration).
-- Reading an existing IPS QR and filling the form from it — the inverse of what
-  `payload.ts` already does, and `jsqr` is already a dependency.
+
+**Reading an existing IPS QR to fill the form** was on this list and is not any more:
+decided against on 2026-09-10. It looked like the obvious next feature — the inverse of
+what `payload.ts` already does — which is exactly why it is worth recording that it was
+turned down rather than forgotten.
+
+`jsqr` stays regardless, and is not a leftover of that idea: it is a devDependency, and
+`tests/ips.spec.ts` and `tests/profiles.spec.ts` use it to read the symbol back off the
+rendered page, one cell at a time as a phone would. Nothing else checks that the code we
+print can be scanned at all, and it reaches no browser.

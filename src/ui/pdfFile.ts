@@ -79,6 +79,16 @@ function openInTab(file: File): boolean {
 }
 
 /**
+ * A device held in the hand, where the share sheet beats anything the page can do.
+ *
+ * Touch points rather than the user agent: iPadOS Safari calls itself a Mac, and a Mac
+ * has none. This is what a phone has and a desktop does not.
+ */
+function isHandheld(): boolean {
+  return navigator.maxTouchPoints > 0;
+}
+
+/**
  * The system share sheet, which on a phone is where Print lives. Returns whether the
  * document was handed over; a sheet the visitor then dismisses still counts.
  */
@@ -91,8 +101,13 @@ function share(file: File): boolean {
 
 /** Puts the document wherever this browser can be printed from. */
 function handOver(file: File): boolean {
+  // On a phone the share sheet wins even when the browser draws PDFs itself. iOS Safari
+  // does draw them, and the tab it opens costs four taps to reach Print and leaves the
+  // form behind; the sheet rises over the form and Print is one tap down it.
+  if (isHandheld() && share(file)) return true;
+
   // `navigator.pdfViewerEnabled` asks whether the browser draws PDFs itself instead of
-  // handing them to the system — in practice, a desktop browser rather than a phone.
+  // handing them to the system.
   if (!navigator.pdfViewerEnabled) return share(file);
   if (isSafari()) return openInTab(file);
   printInFrame(file);

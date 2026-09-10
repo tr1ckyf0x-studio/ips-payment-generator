@@ -211,8 +211,14 @@ guessed at:
   There the document goes into a frame of its own and `print()` opens the dialog on it.
   The frame is `visibility: hidden` and not `display: none`: a frame that is not laid
   out has nothing to print.
-- Where it does not, the system share sheet is the way to the printer, and on a phone
-  that sheet is where Print lives. Asked for with `navigator.canShare({ files })`.
+- **On a handheld the sheet comes first**, whether or not the browser draws PDFs. iOS
+  Safari does draw them, and reports `pdfViewerEnabled: true`, so it used to be sent to
+  a tab: four taps to reach Print and the form left behind, against one tap down a sheet
+  that rises over the form. A handheld is `navigator.maxTouchPoints > 0` — a capability,
+  and the one that works where the user agent does not, since iPadOS Safari calls itself
+  a Mac and a Mac has no touch points.
+- Where the browser hands PDFs to the system rather than drawing them, the sheet is the
+  only way to a printer anyway. Asked for with `navigator.canShare({ files })`.
 - Neither, or a popup the browser blocked: the file itself, under the name it would have
   been saved under. This is what a blob URL opened in a tab loses — the browser names
   the download after the URL's UUID, so `nalog-za-uplatu-2026-09-10.pdf` arrives as

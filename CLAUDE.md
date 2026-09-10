@@ -352,6 +352,44 @@ Two things worth knowing that fall out of it:
   carries whatever that particular sheet was cut and printed to. The proportions, which
   come from nine sheets, are the sturdier half.
 
+## Being found
+
+A search engine can offer one page per URL, so three languages need three URLs:
+`/` is Russian, `/sr/` Serbian, `/en/` English. `src/i18n/routing.ts` is the only place
+that mapping lives; `tests/seo.spec.ts` holds the three pages to it.
+
+**One URL, one language.** The path decides and `Accept-Language` gets no vote. Serving
+whatever the browser asks for at a single address is dynamic serving, and it would have
+let a crawler — which asks in English and has no stored preference — index the root as
+English while that same page's markup declared Russian and pointed `hreflang` at `/en/`.
+The root would have competed with `/en/` for the same content. A visitor's own choice is
+still remembered between visits, and a crawler has no such memory, so the root stays
+Russian for it.
+
+**The address never changes while the app is used.** Switching language in the form
+re-renders in place; it does not rewrite the address bar, so nothing typed is lost. The
+three URLs are entry points, not routes.
+
+**Each page says what it is before any script runs.** The body carried nothing but an
+empty `#root`, which is all a crawler's first pass would have seen. Each now holds a
+heading, a paragraph and a list in its own language, inside `#root`, which React replaces
+on mount. The runtime `documentTitle` was also changed to match the `<title>` in the
+markup — a rendering crawler reads the runtime one, so the two disagreeing would have
+thrown away whichever was better.
+
+**Wrong paths 404 rather than answering with the app.** `not_found_handling` was
+`single-page-application`, which returned 200 and the whole app for every path that did
+not exist — an unlimited supply of duplicate pages, and a soft 404 to anything crawling
+it. There were never any client-side routes to justify it. `html_handling` is now spelled
+out too, since it is what lets a hand-typed `/sr` reach `/sr/index.html`.
+
+`public/` carries `robots.txt`, `sitemap.xml` listing the three pages with their
+alternates, an SVG icon and the 404 page.
+
+Still to do, and neither is code: verify the domain in Google Search Console and submit
+the sitemap, and get a link to the site from somewhere Google already crawls. Nothing
+here makes a page rank on its own; it makes it eligible.
+
 ## Deployment
 
 Cloudflare **Workers** with static assets, not Pages: Cloudflare treats Pages as legacy,

@@ -119,6 +119,30 @@ test('hands over a PDF when asked', async ({ page }) => {
   expect(Buffer.concat(head).subarray(0, 5).toString()).toBe('%PDF-');
 });
 
+test('hands the document to the browser to print', async ({ page }) => {
+  await page.goto('/');
+  await fillSlip(page);
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 20_000 });
+
+  // Which route is taken depends on what the browser can do: a frame of its own where it
+  // draws PDFs itself, the system share sheet on a phone, the file where neither exists.
+  // Headless Chromium reports no PDF viewer and offers no share sheet, so here it is the
+  // last of the three — and it must still arrive under the name the slip would be saved
+  // under, which is the thing a blob URL in a tab silently loses.
+  const saved = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Печать|Print|Štampaj/ }).click();
+
+  const frame = page.locator('iframe#print-document');
+  const handedOver = await Promise.race([
+    frame.waitFor({ state: 'attached', timeout: 15_000 }).then(() => frame.getAttribute('src')),
+    saved.then((file) => file.suggestedFilename()),
+  ]).catch(() => undefined);
+
+  expect(handedOver ?? '', 'the print action produced no document').toMatch(
+    /^blob:|^nalog-za-uplatu-\d{4}-\d{2}-\d{2}\.pdf$/,
+  );
+});
+
 test('answers a path that does not exist with a real 404', async ({ page }) => {
   // It used to answer 200 with the whole application, which reads as an unlimited
   // supply of duplicate pages to anything crawling the site.

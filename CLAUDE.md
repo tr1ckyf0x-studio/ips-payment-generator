@@ -182,6 +182,33 @@ The chain is: spec is checked against the reference blank, and the generated PDF
 parsed back with the same extractor and checked against the spec. A wrong coordinate
 has to be wrong in both directions to reach paper.
 
+## Getting the document out
+
+`src/ui/pdfFile.ts` holds both ways a finished PDF leaves the app, because a slip saved
+and a slip printed must never be different bytes.
+
+Printing has no single way to do it, and the routes are chosen by capability rather than
+guessed at:
+
+- `navigator.pdfViewerEnabled` says the browser draws PDFs itself instead of handing
+  them to the operating system — in practice, a desktop browser rather than a phone.
+  There the document goes into a frame of its own and `print()` opens the dialog on it.
+  The frame is `visibility: hidden` and not `display: none`: a frame that is not laid
+  out has nothing to print.
+- Where it does not, the system share sheet is the way to the printer, and on a phone
+  that sheet is where Print lives. Asked for with `navigator.canShare({ files })`.
+- Neither, or a popup the browser blocked: the file itself, under the name it would have
+  been saved under. This is what a blob URL opened in a tab loses — the browser names
+  the download after the URL's UUID, so `nalog-za-uplatu-2026-09-10.pdf` arrives as
+  `a376646f-f9ee-4329-8d44-5878f4fed2b6.pdf`.
+
+**Safari is the one thing here recognised by name.** It draws PDFs and still ignores
+`print()` from a frame; there is no capability to test for that, so it gets the document
+in a tab and presses Cmd-P itself. The alternative is a button that silently does nothing.
+
+The frame route needs `frame-src 'self' blob:` in the content security policy —
+documents this page made, and nothing else.
+
 ## Sizes that matter
 
 - Slip cell is the normative **99 mm**; three stack to exactly 297 mm, a full A4.

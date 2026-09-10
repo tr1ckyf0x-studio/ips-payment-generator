@@ -122,6 +122,9 @@ describe('the headers Cloudflare is told to send', () => {
     expect(directive('worker-src')).toContain('blob:');
     expect(directive('script-src')).toContain("'wasm-unsafe-eval'");
     expect(directive('style-src')).toContain("'unsafe-inline'");
+    // Printing loads the generated document into a frame of its own to reach the print
+    // dialog. Only documents this page made: `blob:` covers nothing it did not create.
+    expect(directive('frame-src')).toBe("frame-src 'self' blob:");
   });
 
   it('sends the small headers that cost nothing', () => {

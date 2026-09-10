@@ -21,6 +21,7 @@ export const sr: Translation = {
     blank: 'Obrazac',
     addSlip: 'Dodaj nalog',
     download: 'Preuzmi PDF',
+    print: 'Štampaj',
     printHint:
       'Pri štampi izaberite <b>razmeru 100 % / Actual size</b>, a ne „prilagodi stranici“ — inače obrazac neće odgovarati propisanim 210 × 99 mm. Secite po isprekidanoj liniji.',
     buildFailed: 'Nije moguće napraviti PDF: {{message}}',

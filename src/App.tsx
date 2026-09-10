@@ -8,6 +8,7 @@ import { SLIPS_PER_SHEET } from './layout/paginate.ts';
 import { DEFAULT_PROFILE, type ProfileId } from './layout/formSpec.ts';
 import { LEGIBLE_SIZE_PT } from './layout/fitText.ts';
 import { LANGUAGE_NAMES, type Language } from './i18n/index.ts';
+import { downloadPdf, printPdf } from './ui/pdfFile.ts';
 import styles from './App.module.css';
 
 let nextId = 0;
@@ -52,14 +53,11 @@ export function App() {
   const sheets = Math.max(1, Math.ceil(slips.length / SLIPS_PER_SHEET));
 
   const download = useCallback(() => {
-    if (!bytes) return;
-    const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `nalog-za-uplatu-${new Date().toISOString().slice(0, 10)}.pdf`;
-    link.click();
-    URL.revokeObjectURL(url);
+    if (bytes) downloadPdf(bytes);
+  }, [bytes]);
+
+  const print = useCallback(() => {
+    if (bytes) printPdf(bytes);
   }, [bytes]);
 
   /**
@@ -115,8 +113,11 @@ export function App() {
             <button type="button" onClick={add}>
               {t('app.addSlip')}
             </button>
-            <button type="button" className={styles.primary} onClick={download} disabled={!bytes}>
+            <button type="button" onClick={download} disabled={!bytes}>
               {t('app.download')}
+            </button>
+            <button type="button" className={styles.primary} onClick={print} disabled={!bytes}>
+              {t('app.print')}
             </button>
           </div>
         </header>

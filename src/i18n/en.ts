@@ -18,6 +18,7 @@ export const en: Translation = {
     blank: 'Blank',
     addSlip: 'Add slip',
     download: 'Download PDF',
+    print: 'Print',
     printHint:
       'Print at <b>100 % / Actual size</b>, not "fit to page" — otherwise the slip will not match the required 210 × 99 mm. Cut along the dashed line.',
     buildFailed: 'Could not build the PDF: {{message}}',

@@ -75,7 +75,7 @@ describe('the built bundle', () => {
     for (const page of ['index.html', 'sr/index.html', 'en/index.html']) {
       expect(existsSync(join(outDir, page)), `${page} was not built`).toBe(true);
     }
-    for (const asset of ['robots.txt', 'sitemap.xml', '404.html', 'icon.svg', 'og.png']) {
+    for (const asset of ['robots.txt', 'sitemap.xml', '404.html', 'icon.svg', 'og.png', '_headers']) {
       expect(existsSync(join(outDir, asset)), `${asset} did not reach the output`).toBe(true);
     }
   });

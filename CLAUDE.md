@@ -352,6 +352,23 @@ Two things worth knowing that fall out of it:
   carries whatever that particular sheet was cut and printed to. The proportions, which
   come from nine sheets, are the sturdier half.
 
+## The privacy promise is enforced, not asserted
+
+Every page says payment details do not leave the device. `public/_headers` makes the
+browser hold us to it: `connect-src 'self'` means the page cannot open a connection to
+any other origin, and `form-action 'none'` means it cannot post anywhere at all. If
+something one day tried to phone home, it would fail rather than succeed quietly.
+
+The policy is as tight as the app allows, and the exceptions are all earned: pdf.js runs
+a worker of its own and uses WebAssembly, and each page carries an inline `<style>` for
+the copy shown before the app mounts. It was arrived at by serving the built site under
+this exact policy and watching the console — filling the form, rendering the preview and
+building a PDF produced no violation at all. `vite preview` does not apply `_headers`, so
+that check needs a server that does.
+
+`tests/seo.spec.ts` holds the directives that carry the promise, so widening them is a
+deliberate act rather than a slip.
+
 ## Being found
 
 A search engine can offer one page per URL, so three languages need three URLs:

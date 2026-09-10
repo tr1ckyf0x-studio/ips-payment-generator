@@ -91,6 +91,46 @@ describe.each(languages)('the %s page', (language) => {
   });
 });
 
+describe('the headers Cloudflare is told to send', () => {
+  const headers = readFileSync('public/_headers', 'utf8');
+  const policy = /Content-Security-Policy: (.+)/.exec(headers)?.[1] ?? '';
+  const directive = (name: string) =>
+    policy
+      .split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(`${name} `));
+
+  it('lets the page reach nothing but itself', () => {
+    // This is the app's one promise made enforceable: it cannot post anywhere, and it
+    // cannot open a connection to any other origin. Widening either would make the
+    // README's claim untrue without anything else noticing.
+    expect(directive('connect-src')).toBe("connect-src 'self' blob: data:");
+    expect(directive('form-action')).toBe("form-action 'none'");
+    expect(directive('default-src')).toBe("default-src 'self'");
+  });
+
+  it('refuses to be framed or to have its base rewritten', () => {
+    expect(directive('frame-ancestors')).toBe("frame-ancestors 'none'");
+    expect(directive('base-uri')).toBe("base-uri 'none'");
+    expect(directive('object-src')).toBe("object-src 'none'");
+  });
+
+  it('still allows what the app genuinely needs', () => {
+    // Verified by serving the build under this exact policy and finding the console
+    // clean: pdf.js needs a worker of its own and WebAssembly, and the pages carry an
+    // inline style block.
+    expect(directive('worker-src')).toContain('blob:');
+    expect(directive('script-src')).toContain("'wasm-unsafe-eval'");
+    expect(directive('style-src')).toContain("'unsafe-inline'");
+  });
+
+  it('sends the small headers that cost nothing', () => {
+    expect(headers).toContain('X-Content-Type-Options: nosniff');
+    expect(headers).toContain('Referrer-Policy: no-referrer');
+    expect(headers).toMatch(/Permissions-Policy: .*camera=\(\)/);
+  });
+});
+
 describe('robots and sitemap', () => {
   const robots = readFileSync('public/robots.txt', 'utf8');
   const sitemap = readFileSync('public/sitemap.xml', 'utf8');

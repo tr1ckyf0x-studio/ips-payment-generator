@@ -1,0 +1,15 @@
+# Cloudflare reads this file and sends these with every matching response.
+#
+# The point of the policy below is that this app's one promise — payment details do not
+# leave the device — stops being a sentence in the README and becomes something the
+# browser enforces. `connect-src 'self'` means the page cannot reach any other origin,
+# and `form-action 'none'` means it cannot post anywhere at all.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# Hashed file names never change contents, so they can be held forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

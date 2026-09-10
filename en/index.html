@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Serbian payment slip generator with IPS QR code — free</title>
+    <meta
+      name="description"
+      content="Free generator for the Serbian payment slip (nalog za uplatu): fill the form and download an A4 PDF holding three slips at their true 210 × 99 mm, each with an NBS IPS QR code. Everything runs in the browser — no payment details leave the device."
+    />
+    <link rel="canonical" href="https://ips.tr1ckyf0x.dev/en/" />
+    <link rel="alternate" hreflang="ru" href="https://ips.tr1ckyf0x.dev/" />
+    <link rel="alternate" hreflang="sr" href="https://ips.tr1ckyf0x.dev/sr/" />
+    <link rel="alternate" hreflang="en" href="https://ips.tr1ckyf0x.dev/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://ips.tr1ckyf0x.dev/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ips.tr1ckyf0x.dev/en/" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content="Nalog za uplatu" />
+    <meta property="og:title" content="Serbian payment slip generator with IPS QR code" />
+    <meta
+      property="og:description"
+      content="An A4 PDF with three slips at true size, each carrying an NBS IPS QR code. Everything runs in the browser."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Nalog za uplatu",
+        "url": "https://ips.tr1ckyf0x.dev/en/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "inLanguage": ["ru", "sr", "en"],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "RSD" }
+      }
+    </script>
+
+    <style>
+      /* Shown until the app mounts and React replaces it. Deliberately plain: it exists
+         so the page says what it is before any script has run. */
+      .intro {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem;
+        font: 16px/1.6 system-ui, sans-serif;
+        color: #ddd;
+        background: #1a1a1a;
+      }
+      .intro h1 {
+        font-size: 1.4rem;
+      }
+      body {
+        margin: 0;
+        background: #1a1a1a;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="intro">
+        <h1>Serbian payment slip generator with IPS QR code</h1>
+        <p>
+          Fill the form and download an A4 PDF holding three payment slips at their true
+          size, 210 × 99 mm, each carrying an NBS IPS QR code. It prints on plain paper:
+          the blank itself is drawn, so no pre-printed stock is needed.
+        </p>
+        <ul>
+          <li>QR code to the National Bank of Serbia's specification — pay by scanning</li>
+          <li>Blank geometry measured from real slips and checked against a reference</li>
+          <li>Everything runs in the browser: no payment details leave the device</li>
+          <li>Interface in English, Serbian and Russian</li>
+        </ul>
+        <p>
+          Other languages:
+          <a href="/" hreflang="ru">русский</a> ·
+          <a href="/sr/" hreflang="sr">srpski</a>
+        </p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

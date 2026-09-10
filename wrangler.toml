@@ -9,9 +9,13 @@ compatibility_date = "2026-09-09"
 
 [assets]
 directory = "./dist"
-# The app is a single page with no client-side routes; serving index.html for any path
-# means a stale bookmark or a hand-typed URL still opens the form rather than a 404.
-not_found_handling = "single-page-application"
+# A real 404 rather than the single-page fallback. The fallback answered 200 with the
+# app for every wrong path, which reads to a search engine as an unlimited supply of
+# duplicate pages — a soft 404 — and there are no client-side routes that needed it.
+not_found_handling = "404-page"
+# Spelled out rather than left to the default, because the language pages depend on it:
+# it is what makes a hand-typed `/sr` reach `/sr/index.html` instead of the 404 page.
+html_handling = "auto-trailing-slash"
 
 # Attaching the domain here rather than in the dashboard: wrangler creates the DNS
 # record and the route itself, which keeps the whole deployment reproducible from the

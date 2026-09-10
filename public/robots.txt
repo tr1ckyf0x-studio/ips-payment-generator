@@ -1,0 +1,5 @@
+# Everything here is public and safe to crawl.
+User-agent: *
+Allow: /
+
+Sitemap: https://ips.tr1ckyf0x.dev/sitemap.xml

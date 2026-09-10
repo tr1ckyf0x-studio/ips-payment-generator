@@ -18,6 +18,15 @@ export default defineConfig({
     ],
   },
   build: {
+    // One page per language, because a search engine can only offer one per URL. All
+    // three load the same app; only the head and the pre-render copy differ.
+    rollupOptions: {
+      input: {
+        ru: resolve('./index.html'),
+        sr: resolve('./sr/index.html'),
+        en: resolve('./en/index.html'),
+      },
+    },
     /**
      * The default 500 kB warns about the lazy `renderer` chunk — pdf-lib, fontkit and the
      * QR builder, 1058 kB, which no longer blocks the first paint. Its size is a decision

@@ -11,6 +11,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { ru } from './ru.ts';
 import { sr } from './sr.ts';
 import { en } from './en.ts';
+import { languageFromPath } from './routing.ts';
 
 export const LANGUAGES = { ru, sr, en } as const;
 export type Language = keyof typeof LANGUAGES;
@@ -32,18 +33,34 @@ export const resources = Object.fromEntries(
   }),
 );
 
+/**
+ * One URL, one language.
+ *
+ * The path decides, and where it names none — the root — Russian is what the page is
+ * written in, so Russian is what runs. The browser's `Accept-Language` deliberately does
+ * not get a vote: serving a different language at the same URL is what search engines
+ * call dynamic serving, and it would have let a crawler index the root as English while
+ * its own markup declared Russian and pointed `hreflang` at `/en/` for English.
+ *
+ * A visitor who picks a language still gets it back on the next visit — that choice is
+ * remembered, and a crawler has no such memory, so the root stays Russian for it.
+ */
+const fromPath =
+  typeof window === 'undefined' ? undefined : languageFromPath(window.location.pathname);
+
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
+    lng: fromPath,
+    fallbackLng: 'ru',
     supportedLngs: Object.keys(LANGUAGES),
     // Serbian is served in Latin script, so sr-Cyrl and sr-Latn both land on 'sr'.
     load: 'languageOnly',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       lookupLocalStorage: 'nalog-za-uplatu.language',
       caches: ['localStorage'],
     },

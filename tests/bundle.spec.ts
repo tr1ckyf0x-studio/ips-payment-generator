@@ -8,7 +8,7 @@
  * What ships is what the build emits, so that is what is measured.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { build } from 'vite';
@@ -48,8 +48,14 @@ beforeAll(async () => {
     .filter((f) => f.endsWith('.js'))
     .map((name) => ({ name, code: readFileSync(join(assets, name), 'utf8') }));
 
-  const found = chunks.find((c) => /^index-.*\.js$/.test(c.name));
-  expect(found, 'the build emitted no entry chunk').toBeDefined();
+  // Ask the page which chunk it loads rather than guessing from the file name: adding
+  // the per-language entry points renamed it from index-*.js to main-*.js, and this
+  // test failed for that alone.
+  const html = readFileSync(join(outDir, 'index.html'), 'utf8');
+  const src = /<script[^>]+type="module"[^>]+src="\/assets\/([^"]+)"/.exec(html)?.[1];
+  expect(src, 'the page loads no module script').toBeDefined();
+  const found = chunks.find((c) => c.name === src);
+  expect(found, `the build emitted no chunk named ${src}`).toBeDefined();
   entry = found!;
 }, 120_000);
 
@@ -61,6 +67,17 @@ describe('the built bundle', () => {
     expect(chunks.length).toBeGreaterThan(1);
     expect(chunks.reduce((n, c) => n + c.code.length, 0)).toBeGreaterThan(1_000_000);
     expect(chunks.some((c) => c.code.includes('НАЛОГ ЗА УПЛАТУ'))).toBe(true);
+  });
+
+  it('emits a page for every language', () => {
+    // The head tags themselves are checked in seo.spec.ts, off the sources; what can
+    // only be seen here is whether the build was told about all three entry points.
+    for (const page of ['index.html', 'sr/index.html', 'en/index.html']) {
+      expect(existsSync(join(outDir, page)), `${page} was not built`).toBe(true);
+    }
+    for (const asset of ['robots.txt', 'sitemap.xml', '404.html', 'icon.svg']) {
+      expect(existsSync(join(outDir, asset)), `${asset} did not reach the output`).toBe(true);
+    }
   });
 
   it('carries no standard PDF font metrics, in any chunk', () => {

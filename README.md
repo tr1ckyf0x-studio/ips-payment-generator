@@ -15,7 +15,9 @@ the device.
 - Two blank variants: **OPTIMUM d.o.o.** (measured from real slips) and **HSFormular**.
 - **IPS QR** per the National Bank specification, validated before it is drawn — a slip
   that cannot make a valid payload prints without a code and the form says why.
-- Interface in Russian, Serbian and English, picked from the browser and remembered.
+- Interface in Russian, Serbian and English, one language per address —
+  [`/`](https://ips.tr1ckyf0x.dev/), [`/sr/`](https://ips.tr1ckyf0x.dev/sr/),
+  [`/en/`](https://ips.tr1ckyf0x.dev/en/) — and your choice is remembered.
 - Long values are scaled down rather than allowed to overrun a field.
 
 ## Development

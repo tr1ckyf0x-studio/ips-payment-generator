@@ -34,7 +34,7 @@ export const ru = {
     qrFailedBody: 'Платёжка напечатается без него — оплатить можно как обычно, по реквизитам.',
     slipNumber: 'платёжка {{number}}',
     language: 'Язык',
-    documentTitle: 'Налог за уплату — генератор платёжек',
+    documentTitle: 'Генератор платёжек «налог за уплату» для Сербии с IPS QR-кодом',
   },
   footer: {
     source: 'Исходный код на GitHub',

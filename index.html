@@ -3,10 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Налог за уплату — генератор платёжек</title>
+    <title>Генератор платёжек «налог за уплату» для Сербии с IPS QR-кодом</title>
+    <meta
+      name="description"
+      content="Бесплатный генератор сербских платёжных поручений: заполните форму и получите PDF формата A4 с тремя платёжками 210 × 99 мм и QR-кодом NBS IPS. Всё считается в браузере, реквизиты никуда не отправляются."
+    />
+    <link rel="canonical" href="https://ips.tr1ckyf0x.dev/" />
+    <link rel="alternate" hreflang="ru" href="https://ips.tr1ckyf0x.dev/" />
+    <link rel="alternate" hreflang="sr" href="https://ips.tr1ckyf0x.dev/sr/" />
+    <link rel="alternate" hreflang="en" href="https://ips.tr1ckyf0x.dev/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://ips.tr1ckyf0x.dev/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ips.tr1ckyf0x.dev/" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Nalog za uplatu" />
+    <meta property="og:title" content="Генератор платёжек «налог за уплату» для Сербии" />
+    <meta
+      property="og:description"
+      content="PDF формата A4 с тремя платёжками в натуральную величину и QR-кодом NBS IPS. Всё считается в браузере."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Nalog za uplatu",
+        "url": "https://ips.tr1ckyf0x.dev/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "inLanguage": ["ru", "sr", "en"],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "RSD" }
+      }
+    </script>
+
+    <style>
+      /* Shown until the app mounts and React replaces it. Deliberately plain: it exists
+         so the page says what it is before any script has run. */
+      .intro {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem;
+        font: 16px/1.6 system-ui, sans-serif;
+        color: #ddd;
+        background: #1a1a1a;
+      }
+      .intro h1 {
+        font-size: 1.4rem;
+      }
+      body {
+        margin: 0;
+        background: #1a1a1a;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="intro">
+        <h1>Генератор платёжек «налог за уплату» для Сербии</h1>
+        <p>
+          Заполните форму — получите PDF формата A4 с тремя платёжными поручениями в
+          натуральную величину, 210 × 99 мм, каждое с QR-кодом NBS IPS. Печатать можно на
+          обычной бумаге: бланк рисуется целиком, готовые типографские листы не нужны.
+        </p>
+        <ul>
+          <li>QR-код по спецификации Народного банка Сербии — оплата сканированием</li>
+          <li>Геометрия бланка снята с настоящих платёжек и выверена по эталону</li>
+          <li>
+            Всё считается в браузере: ни реквизиты, ни суммы никуда не отправляются
+          </li>
+          <li>Интерфейс на русском, сербском и английском</li>
+        </ul>
+        <p>
+          Другие языки:
+          <a href="/sr/" hreflang="sr">srpski</a> ·
+          <a href="/en/" hreflang="en">English</a>
+        </p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

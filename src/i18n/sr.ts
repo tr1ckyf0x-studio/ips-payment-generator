@@ -30,7 +30,7 @@ export const sr: Translation = {
     qrFailedBody: 'Nalog se štampa bez njega — plaćanje je moguće kao i obično, po podacima.',
     slipNumber: 'nalog {{number}}',
     language: 'Jezik',
-    documentTitle: 'Nalog za uplatu — generator naloga',
+    documentTitle: 'Generator naloga za uplatu sa NBS IPS QR kodom — besplatno',
   },
   footer: {
     source: 'Izvorni kôd na GitHub-u',

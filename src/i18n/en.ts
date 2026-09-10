@@ -27,7 +27,7 @@ export const en: Translation = {
     qrFailedBody: 'The slip prints without one — it can still be paid over the counter as usual.',
     slipNumber: 'slip {{number}}',
     language: 'Language',
-    documentTitle: 'Nalog za uplatu — payment slip generator',
+    documentTitle: 'Serbian payment slip generator with IPS QR code — free',
   },
   footer: {
     source: 'Source code on GitHub',

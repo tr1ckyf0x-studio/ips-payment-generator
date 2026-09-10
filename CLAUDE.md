@@ -498,13 +498,22 @@ deployment credentials and a gate:
 - **`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are environment secrets**, not
   repository ones. A token that can deploy is therefore unreadable by any workflow that
   does not declare `environment: production` — CI on a pull request cannot see it.
-- **A required reviewer** must approve each deployment, so pushing a tag no longer
-  publishes on its own: the run waits until it is approved in the Actions tab.
+- **Only a tag shaped `x.y.z` may deploy to it.** The pattern is `[0-9]*.[0-9]*.[0-9]*`,
+  and it is checked by GitHub before the job starts, so unlike the workflow's own shell
+  check it cannot be removed by editing the workflow.
 
-Still open: a deployment tag policy restricting the environment to
-`[0-9]+.[0-9]+.[0-9]+`. Today the tag shape is enforced only by a shell step in the
-workflow, which anyone editing the workflow can remove; the environment would enforce it
-outside the workflow's reach.
+  The pattern is **fnmatch, not a regular expression** — GitHub matches these with Ruby's
+  `File.fnmatch`. `[0-9]+.[0-9]+.[0-9]+`, which is what the workflow's own `on: push:
+  tags` filter uses, matches nothing here: `+` is a literal plus, not a quantifier. The
+  environment page said "currently applies to 0 tags", which is worth reading rather than
+  skimming.
+
+A required reviewer was tried and removed. It guarded the wrong thing: the worry was a
+pull request that edits a workflow to print the secrets, and that is already impossible —
+a pull request from a fork runs with no access to repository secrets at all, and `ci.yml`
+is triggered by `pull_request`, not `pull_request_target`, which is the trigger that would
+hand them over. The reviewer only stood between someone who already had write access and
+the token, and cost a click on every release.
 
 ## Not done yet
 

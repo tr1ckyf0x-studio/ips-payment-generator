@@ -61,9 +61,8 @@ character that was cut.
 
 ## Deployment
 
-Pushing a tag of the form `x.y.z` typechecks, tests, builds and — once the deployment is
-approved in the Actions tab, since the `production` environment requires a reviewer —
-publishes to Cloudflare Workers. The tag must match `version` in `package.json`, or the workflow stops. The
+Pushing a tag of the form `x.y.z` typechecks, tests, builds and publishes to Cloudflare
+Workers. The tag must match `version` in `package.json`, or the workflow stops. The
 GitHub release is published by hand afterwards, with notes written for the release rather
 than generated from the commit list.
 

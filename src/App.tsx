@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { SlipForm } from './ui/SlipForm.tsx';
 import { PdfPreview } from './ui/PdfPreview.tsx';
 import { usePdfDocument } from './ui/usePdfDocument.ts';
-import { emptySlip, type Slip } from './model/slip.ts';
+import { emptySlip, isBlank, type Slip } from './model/slip.ts';
 import { SLIPS_PER_SHEET } from './layout/paginate.ts';
 import { DEFAULT_PROFILE, type ProfileId } from './layout/formSpec.ts';
 import { LEGIBLE_SIZE_PT } from './layout/fitText.ts';
@@ -83,8 +83,10 @@ export function App() {
     () =>
       qr
         .filter((report) => report.problems.length > 0)
-        .map((report) => {
-          const index = slips.findIndex((s) => s.id === report.slipId);
+        .map((report) => ({ report, index: slips.findIndex((s) => s.id === report.slipId) }))
+        // A slip still untouched is not a slip with something wrong with it.
+        .filter(({ index }) => index >= 0 && !isBlank(slips[index]))
+        .map(({ report, index }) => {
           const detail = report.problems
             .map((p) => `${t(`fields.${p.field}`)}: ${t(`ips.${p.code}`, p.params ?? {})}` +
               (p.code === 'model97' && p.params ? t('ips.model97Suggestion', p.params) : ''))

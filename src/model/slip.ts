@@ -53,6 +53,19 @@ export function emptySlip(id: string): Slip {
 }
 
 /**
+ * A slip nobody has typed into yet.
+ *
+ * Such a slip cannot make an IPS payload either, but saying so is complaining about the
+ * empty form the app opens with: the first thing a visitor saw was a warning about
+ * fields they had not reached. Compared against `emptySlip` rather than against a list
+ * of fields, so a new field cannot be forgotten here.
+ */
+export function isBlank(slip: Slip): boolean {
+  const empty = emptySlip(slip.id);
+  return (Object.keys(empty) as Array<keyof Slip>).every((key) => slip[key] === empty[key]);
+}
+
+/**
  * The three-digit payment code as printed on the blank, or an empty string while
  * either half is still unset.
  */

@@ -241,6 +241,11 @@ documents this page made, and nothing else.
   careful about it — injected `Storage`, every access guarded, because Safari's private
   mode and blocked site data both throw. Careful storage of something not worth storing
   is still storage; it was removed rather than improved.
+- **A slip nobody has typed into is not a slip with something wrong with it.** An empty
+  slip cannot make an IPS payload either, and the app used to open by saying so —
+  greeting every visitor with a warning about fields they had not reached. `isBlank()`
+  compares against `emptySlip` rather than against a list of fields, so a field added
+  later cannot be forgotten here.
 - "место и датум пријема" and "датум извршења" are filled in by the bank at payment
   time, so they are neither form fields nor model fields — but their rules and wording
   are still drawn. `tests/values.spec.ts` guards both halves of that.

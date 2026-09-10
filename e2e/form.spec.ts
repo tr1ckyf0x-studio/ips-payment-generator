@@ -119,6 +119,17 @@ test('hands over a PDF when asked', async ({ page }) => {
   expect(Buffer.concat(head).subarray(0, 5).toString()).toBe('%PDF-');
 });
 
+test('says nothing about a form nobody has filled in yet', async ({ page }) => {
+  await page.goto('/');
+  // The complaint can only appear once a document has been rendered, so asserting its
+  // absence before that would pass against any behaviour at all. Wait for the preview.
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 20_000 });
+
+  // An empty slip cannot make an IPS payload, and the app used to open by saying so —
+  // greeting every visitor with a warning about fields they had not reached.
+  await expect(page.getByText(/QR-код не сформирован|No QR code|QR kôd nije/)).toHaveCount(0);
+});
+
 test('hands the document to the browser to print', async ({ page }) => {
   await page.goto('/');
   await fillSlip(page);

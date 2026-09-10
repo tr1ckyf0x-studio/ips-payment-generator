@@ -612,9 +612,23 @@ because a build labelled with the wrong version is worse than no build.
 ```bash
 npm version 0.2.0 --no-git-tag-version     # package.json only
 git commit -am 'Release 0.2.0'
-git commit --amend --no-edit -S            # tags and releases are signed
-git push origin main
-git tag -s 0.2.0 -m 0.2.0 && git push origin 0.2.0
+git commit --amend --no-edit -S            # sign, then tag, then push both
+git tag -s 0.2.0 -m 0.2.0
+git push origin main 0.2.0
+```
+
+**The order is the point, and both halves of it.** Signing rewrites the commit, so a tag
+made before the signature would point at a commit that no longer exists. And one `push`
+carrying both refs leaves no window in which the tag names a commit `origin` has not got
+— push them separately and the interval between the two commands is one where the deploy
+can start from a state the server cannot resolve.
+
+When several commits are waiting to be signed, sign them all at once, taking care that
+the base is the last **pushed** commit — an already-published commit must not be
+rewritten:
+
+```bash
+git rebase --exec 'git commit --amend --no-edit -S' <last pushed commit>
 ```
 
 Pushing the tag builds, tests and deploys to Cloudflare. The GitHub release is published

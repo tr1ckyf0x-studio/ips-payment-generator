@@ -120,6 +120,33 @@
   .editor {
     border-right: none;
     border-bottom: 1px solid var(--line);
+    /* The page scrolls here, not the column. Left a scroll container, it would trap the
+       sticky header below in a box that never scrolls, and nothing would stick. */
+    overflow: visible;
+  }
+
+  /*
+   * On a phone the form runs a screen or more past the actions, and the preview is
+   * further still. A header that scrolls away is a header scrolled back for every time.
+   */
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    align-items: stretch;
+    /* Full bleed over the column's padding, so nothing shows through beside the bar. */
+    margin: 0 -1.25rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top h1 {
+    font-size: 1.15rem;
+  }
+
+  .topActions button {
+    flex: 1;
   }
 }
 

@@ -182,6 +182,22 @@ The chain is: spec is checked against the reference blank, and the generated PDF
 parsed back with the same extractor and checked against the spec. A wrong coordinate
 has to be wrong in both directions to reach paper.
 
+## On a phone
+
+The layout collapses to one column below 900 px, and measured well: nothing overflows
+sideways at 375 px. What that missed is that the page is 2.1 screens tall there with a
+single slip and grows by about another screen for each one added, and the buttons that
+produce the document sat on the first of them — so the last step of every visit was
+scrolling back up to find them. The header is `position: sticky` at that
+width, at about 15 % of the screen.
+
+That also means the editor column has to stop being a scroll container there
+(`overflow: visible`): a sticky child of a box that never scrolls never sticks, and the
+page, not the column, is what scrolls on a phone.
+
+`e2e/mobile.spec.ts` runs at a phone's viewport with touch, under its own Playwright
+project, rather than a desktop window made thin.
+
 ## Getting the document out
 
 `src/ui/pdfFile.ts` holds both ways a finished PDF leaves the app, because a slip saved

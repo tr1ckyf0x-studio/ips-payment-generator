@@ -23,7 +23,12 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: /mobile\.spec\.ts/ },
+    // A phone is where the layout has to give something up, so it is tested where it
+    // has to: a narrow viewport with touch, not a desktop window made thin.
+    { name: 'mobile', use: { ...devices['Pixel 5'] }, testMatch: /mobile\.spec\.ts/ },
+  ],
   webServer: {
     command: `npm run build && npm run serve:dist -- ${PORT}`,
     url: `http://localhost:${PORT}/`,

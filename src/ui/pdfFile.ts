@@ -33,9 +33,15 @@ export function downloadPdf(bytes: Uint8Array): void {
 }
 
 /**
- * Safari draws PDFs and still will not print one out of a frame — the call is ignored,
- * and the visitor gets a button that does nothing. There is no capability to test for
- * that, so it is the one thing here recognised by name.
+ * Safari draws PDFs and still cannot print one out of a frame.
+ *
+ * Measured rather than assumed, on Safari 26 (macOS): reaching the frame's
+ * `contentWindow` throws `SecurityError: Sandbox access violation` — Safari sandboxes a
+ * framed PDF away from the page's own origin, and declaring the `sandbox` attribute
+ * ourselves with `allow-same-origin` does not lift it. A window of its own is not
+ * sandboxed that way and prints fine, which is the route Safari gets.
+ *
+ * There is no capability to test for this, so it is the one thing here known by name.
  */
 function isSafari(): boolean {
   const agent = navigator.userAgent;
@@ -70,12 +76,48 @@ function printInFrame(file: File): void {
   printFrame = { element, url };
 }
 
-/** Shows the document and leaves the printing to the visitor's own ⌘P. */
+/** How often the opened window is asked whether its document has arrived. */
+const READY_POLL_MS = 100;
+/** How long to wait for it before printing anyway. */
+const READY_TIMEOUT_MS = 3000;
+
+/** Shows the document in a window of its own, and opens the print dialog over it. */
 function openInTab(file: File): boolean {
   const url = blobUrl(file);
-  if (window.open(url, '_blank')) return true;
-  URL.revokeObjectURL(url);
-  return false;
+  const tab = window.open(url, '_blank');
+  if (!tab) {
+    URL.revokeObjectURL(url);
+    return false;
+  }
+
+  // Printing before the document arrives prints the wrong thing, so this waits for it
+  // rather than for a chosen number of milliseconds — a number would be a guess about
+  // someone else's machine.
+  //
+  // `readyState` alone is not the signal. A freshly opened window is `about:blank`,
+  // which reports `complete` immediately — measured at 52 ms on Safari, before the PDF
+  // could possibly have loaded — so the address has to have become the document's too.
+  // If the window stops being reachable, the PDF is on screen and ⌘P still works, so
+  // there is nothing to report.
+  const started = Date.now();
+  const timer = setInterval(() => {
+    let ready: boolean;
+    try {
+      if (tab.closed) return clearInterval(timer);
+      ready = tab.location.href === url && tab.document.readyState === 'complete';
+    } catch {
+      return clearInterval(timer);
+    }
+    if (!ready && Date.now() - started < READY_TIMEOUT_MS) return;
+    clearInterval(timer);
+    try {
+      tab.print();
+    } catch {
+      // The document is in front of the visitor either way.
+    }
+  }, READY_POLL_MS);
+
+  return true;
 }
 
 /**

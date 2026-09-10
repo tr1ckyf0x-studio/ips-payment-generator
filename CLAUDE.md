@@ -230,9 +230,22 @@ guessed at:
   the download after the URL's UUID, so `nalog-za-uplatu-2026-09-10.pdf` arrives as
   `a376646f-f9ee-4329-8d44-5878f4fed2b6.pdf`.
 
-**Safari is the one thing here recognised by name.** It draws PDFs and still ignores
-`print()` from a frame; there is no capability to test for that, so it gets the document
-in a tab and presses Cmd-P itself. The alternative is a button that silently does nothing.
+**Safari is the one thing here recognised by name**, and what it does was measured on
+Safari 26 rather than taken from folklore. It draws PDFs and cannot print one out of a
+frame: reaching the frame's `contentWindow` throws `SecurityError: Sandbox access
+violation`, because Safari sandboxes a framed PDF away from the page's own origin.
+Declaring the `sandbox` attribute ourselves with `allow-same-origin` does not lift it.
+
+A window of its own is not sandboxed that way, so Safari gets the document in a tab and
+that tab is asked to print. Two things about the waiting, both measured:
+
+- **`readyState` alone is the wrong signal.** A freshly opened window is `about:blank`
+  and reports `complete` at once — 52 ms, long before the document could have arrived —
+  so printing on that signal prints a blank page. The address has to have become the
+  document's as well. `e2e/form.spec.ts` fails with `print:about` when that half is
+  dropped.
+- **`print()` blocks until the dialog is dismissed.** It is what made a probe appear to
+  take 2.6 seconds when the dialog had in fact opened in about 200 ms.
 
 The frame route needs `frame-src 'self' blob:` in the content security policy —
 documents this page made, and nothing else.

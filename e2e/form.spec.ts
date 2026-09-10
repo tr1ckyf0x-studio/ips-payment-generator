@@ -178,6 +178,53 @@ test('hands the document to the browser to print', async ({ page }) => {
   );
 });
 
+test("opens the print dialog over Safari's own window", async ({ page }) => {
+  // Safari is the one browser that cannot print a framed PDF — it sandboxes the frame
+  // away from the page's origin — so it is given a window of its own and that window is
+  // asked to print. Chromium is not Safari, so the branch is reached by standing in for
+  // one: the decision, the wait and the call are ours and are what this checks. That the
+  // dialog then appears was verified by hand on Safari 26.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'pdfViewerEnabled', { configurable: true, value: true });
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 '
+        + '(KHTML, like Gecko) Version/26.0 Safari/605.1.15',
+    });
+
+    const done: string[] = [];
+    (window as unknown as { __window: string[] }).__window = done;
+    // A window that behaves the way a real one does: `about:blank`, already reporting
+    // `complete`, before the document it was opened for arrives. Printing at that point
+    // would print the blank page, so the stub stays there for a moment.
+    const opened = {
+      closed: false,
+      location: { href: 'about:blank' },
+      document: { readyState: 'complete' },
+      print: () => done.push('print:' + opened.location.href.slice(0, 5)),
+    };
+    Object.defineProperty(window, 'open', {
+      configurable: true,
+      value: (url: string) => {
+        done.push(url.slice(0, 5));
+        setTimeout(() => { opened.location.href = url; }, 250);
+        return opened;
+      },
+    });
+  });
+
+  await page.goto('/');
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 20_000 });
+  await page.getByRole('button', { name: /Печать|Print|Štampaj/ }).click();
+
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __window: string[] }).__window))
+    .toEqual(['blob:', 'print:blob:']);
+
+  // Not the frame route: that is what throws in Safari.
+  expect(await page.locator('iframe#print-document').count()).toBe(0);
+});
+
 test('answers a path that does not exist with a real 404', async ({ page }) => {
   // It used to answer 200 with the whole application, which reads as an unlimited
   // supply of duplicate pages to anything crawling the site.

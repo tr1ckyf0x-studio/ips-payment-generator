@@ -257,6 +257,12 @@ documents this page made, and nothing else.
   careful about it — injected `Storage`, every access guarded, because Safari's private
   mode and blocked site data both throw. Careful storage of something not worth storing
   is still storage; it was removed rather than improved.
+- Buttons and links carry the same accent focus ring the fields have. Nothing was
+  missing there — the browser draws one of its own — so this is consistency, not a fix.
+  A first reading said the ring was absent; it had been measured with `getComputedStyle`
+  on elements that were **not focused**, which reports `outline-style: none` for
+  anything. The check that means something is to press Tab and read the element that
+  `document.activeElement` then returns.
 - **A slip nobody has typed into is not a slip with something wrong with it.** An empty
   slip cannot make an IPS payload either, and the app used to open by saying so —
   greeting every visitor with a warning about fields they had not reached. `isBlank()`

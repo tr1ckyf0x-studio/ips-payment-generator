@@ -79,6 +79,21 @@ textarea:focus {
   outline-offset: -1px;
 }
 
+/*
+ * The keyboard's position, in the app's own colour rather than the browser's.
+ *
+ * There was never a missing ring here — Chromium draws its own, and tabbing to a button
+ * has always shown it. This only makes buttons and links match the fields, which have
+ * had an accent outline all along. `:focus-visible` rather than `:focus`, so a clicked
+ * button does not keep a ring nobody asked for.
+ */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 textarea {
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   font-size: 0.85rem;

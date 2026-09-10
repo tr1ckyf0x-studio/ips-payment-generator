@@ -130,6 +130,30 @@ test('says nothing about a form nobody has filled in yet', async ({ page }) => {
   await expect(page.getByText(/QR-код не сформирован|No QR code|QR kôd nije/)).toHaveCount(0);
 });
 
+test('shows the keyboard where it is', async ({ page }) => {
+  await page.goto('/');
+
+  // This guards against the ring being switched off, not against its absence: browsers
+  // draw one of their own, and `outline: none` on a button — a common way to tidy up a
+  // hover state — is what would take it away. Verified to fail with that line added.
+  //
+  // Tab lands on the first control in the page, which is a button in the header.
+  await page.keyboard.press('Tab');
+  const button = await page.evaluate(() => {
+    const element = document.activeElement as HTMLElement;
+    return { tag: element.tagName, outline: getComputedStyle(element).outlineStyle };
+  });
+  expect(button.tag).toBe('BUTTON');
+  expect(button.outline, 'a focused button shows no outline').not.toBe('none');
+
+  // Links had none either, and the only ones are in the footer.
+  const link = await page.locator('footer a').first().evaluate((element: HTMLElement) => {
+    element.focus();
+    return getComputedStyle(element).outlineStyle;
+  });
+  expect(link, 'a focused link shows no outline').not.toBe('none');
+});
+
 test('hands the document to the browser to print', async ({ page }) => {
   await page.goto('/');
   await fillSlip(page);

@@ -17,7 +17,9 @@
     "fonts": "node tools/fontSamples.ts",
     "ips:verify": "node tools/verifyIps.ts",
     "fonts:subset": "node tools/subsetFonts.ts",
-    "og": "node tools/ogImage.ts"
+    "og": "node tools/ogImage.ts",
+    "serve:dist": "node tools/serveDist.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
@@ -32,6 +34,7 @@
     "react-i18next": "^17.0.13"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.10.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

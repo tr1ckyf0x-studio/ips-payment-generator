@@ -9,3 +9,7 @@ references/scans/
 __pycache__/
 *.tsbuildinfo
 .vite/
+
+# Playwright leaves these behind on a failure.
+test-results/
+playwright-report/

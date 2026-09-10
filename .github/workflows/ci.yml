@@ -50,3 +50,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # The unit suite never opens the app, and every user-visible breakage this project
+      # has had was invisible to it. These run against the built site under the headers
+      # it ships with, so a content security policy that blocks the pdf.js worker fails
+      # here rather than in front of someone.
+      - name: Install the browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Test in a browser
+        run: npm run test:e2e

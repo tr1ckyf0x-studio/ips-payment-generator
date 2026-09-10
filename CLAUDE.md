@@ -352,6 +352,30 @@ Two things worth knowing that fall out of it:
   carries whatever that particular sheet was cut and printed to. The proportions, which
   come from nine sheets, are the sturdier half.
 
+## Tested in a browser, against what ships
+
+`npm test` never opens the app. Every user-visible breakage this project has had was
+found by looking at the page — a dev server serving a stale dependency pre-bundle, pdf.js
+6 changing what `render` accepts, a preview that silently drew nothing — and not one of
+them would have failed a unit test.
+
+`npm run test:e2e` runs Playwright over five things that can only be seen in a browser:
+that filling the form draws a QR, that switching language keeps what was typed and leaves
+the address alone, that each language answers from its own address, that the Download
+button hands over something starting `%PDF-`, and that a path which does not exist
+answers 404. Anything the page logs as an error fails the test it happened in.
+
+**It runs against `dist`, served with `public/_headers`.** Not the dev server, which
+bundles differently, and not `vite preview`, which ignores the headers — `tools/serveDist.ts`
+exists to apply them. That is what makes a content security policy blocking the pdf.js
+worker a failing test rather than a broken deployment.
+
+`reuseExistingServer` is off, and that is not tidiness. A server left running from an
+earlier session held the port, served its own copy of `_headers` read once at its start,
+and the suite passed against a policy that had been deliberately broken to prove the
+tests could see it. A stale server invalidates the whole exercise silently; a rebuild each
+run is the cheaper mistake.
+
 ## The privacy promise is enforced, not asserted
 
 Every page says payment details do not leave the device. `public/_headers` makes the

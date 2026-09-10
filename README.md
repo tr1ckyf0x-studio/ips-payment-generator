@@ -47,6 +47,7 @@ character that was cut.
 
 | Command | Purpose |
 |---|---|
+| `npm run test:e2e` | Playwright over the built site, served with its shipping headers |
 | `npm test` | Full suite: geometry against the reference, rendered output against the layout, QR decoded off the page |
 | `npm run build` | Typecheck and build to `dist/` |
 | `npm run visual` | Sample PDF plus a per-label position report against the reference |
